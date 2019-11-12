@@ -1,0 +1,27 @@
+{
+    "name": "phpzlc/kernel",
+    "description": "",
+    "license": "proprietary",
+    "type": "library",
+    "keywords": [
+        "phpzlc", "symfony", "kernel"
+    ],
+    "authors": [
+        {
+            "name": "jay_he",
+            "email": "hjjhanxing@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PHPZlc\\Kernel\\": [""]
+        }
+    },
+    "require": {
+        "php": ">=7.1"
+    },
+    "require-dev": {
+        "composer/composer": "1.6.3"
+    }
+}
