@@ -5,7 +5,7 @@
  * Date: 2019/7/18
  */
 
-namespace PHPZlc\Kernel\Bundle\SfProgramBundle;
+namespace PHPZlc\Kernel\Bundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

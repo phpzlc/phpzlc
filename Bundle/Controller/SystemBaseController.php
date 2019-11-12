@@ -5,7 +5,7 @@
  * Date: 2019/10/17
  */
 
-namespace PHPZlc\Kernel\Bundle\SfProgramBundle\Controller;
+namespace PHPZlc\Kernel\Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
