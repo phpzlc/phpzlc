@@ -1,0 +1,8 @@
+{
+    "bundles":{
+        "PHPZlc\\Kernel\\Bundle\\PHPZlcBundle": ["all"]
+    },
+    "container": {
+        "hejunjie": "en"
+    }
+}
