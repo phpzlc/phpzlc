@@ -1,1 +1,4 @@
 .idea
+symfony.lock
+composer.lock
+vendor

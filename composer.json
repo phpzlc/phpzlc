@@ -19,9 +19,18 @@
         }
     },
     "require": {
-        "php": ">=7.1"
+        "php": ">=7.1",
+        "phpmyadmin/sql-parser": "^5.0",
+        "symfony/flex": "^1.0"
+
     },
     "require-dev": {
         "composer/composer": "1.6.3"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
     }
 }
