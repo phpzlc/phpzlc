@@ -25,11 +25,5 @@
     },
     "require-dev": {
         "composer/composer": "1.6.3"
-    },
-    "repositories": {
-        "packagist": {
-            "type": "composer",
-            "url": "https://packagist.phpcomposer.com"
-        }
     }
 }
