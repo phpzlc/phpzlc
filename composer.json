@@ -2,7 +2,7 @@
     "name": "phpzlc/kernel",
     "description": "",
     "license": "proprietary",
-    "type": "library",
+    "type": "symfony-bundle",
     "keywords": [
         "phpzlc", "symfony", "kernel"
     ],
