@@ -1,13 +1,13 @@
 <?php
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Mapping;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Mapping;
 
 use Doctrine\Common\Annotations\Annotation\Target;
 use Doctrine\ORM\Mapping\Annotation;
 
 /**
  * Class OuterColumn
- * @package PHPZlc\Kernel\Doctrine\ORM\Mapping\OuterColumn
+ * @package PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn
  * @Annotation
  * @Target({"PROPERTY"})
  */

@@ -5,10 +5,10 @@
  * Date: 2018/11/22
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Rule\Joint;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule\Joint;
 
-use PHPZlc\Kernel\Doctrine\ORM\Rule\InterfaceJoint;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rule;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\InterfaceJoint;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 
 class StringJoint implements InterfaceJoint
 {

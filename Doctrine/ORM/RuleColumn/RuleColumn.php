@@ -5,12 +5,12 @@
  * Date: 2019/8/2
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\RuleColumn;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn;
 
 use ContainerZx2sALA\srcApp_KernelDevDebugContainer;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rule;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rules;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
 
 class RuleColumn
 {

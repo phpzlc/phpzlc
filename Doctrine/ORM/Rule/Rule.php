@@ -1,9 +1,9 @@
 <?php
-namespace PHPZlc\Kernel\Doctrine\ORM\Rule;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule;
 
 use Doctrine\ORM\Mapping as ORM;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Joint\StringJoint;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Joint\StringJoint;
 
 class Rule
 {

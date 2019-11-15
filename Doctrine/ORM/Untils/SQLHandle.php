@@ -5,7 +5,7 @@
  * Date: 2019/8/21
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Untils;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Untils;
 
 class SQLHandle
 {

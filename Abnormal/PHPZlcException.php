@@ -5,7 +5,7 @@
  * Date: 2019/7/24
  */
 
-namespace PHPZlc\Kernel\Abnormal;
+namespace PHPZlc\PHPZlc\Abnormal;
 
 
 class PHPZlcException extends \RuntimeException

@@ -4,10 +4,10 @@
  * 响应封装
  */
 
-namespace PHPZlc\Kernel\Responses;
+namespace PHPZlc\PHPZlc\Responses;
 
-use PHPZlc\Kernel\Abnormal\Error;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Abnormal\Error;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 

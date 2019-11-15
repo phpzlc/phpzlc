@@ -17,7 +17,7 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Hydration;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Hydration;
 
 use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
 use Doctrine\ORM\Internal\Hydration\HydrationException;
@@ -29,8 +29,8 @@ use Doctrine\ORM\Query;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\DBAL\Types\Type;
-use PHPZlc\Kernel\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
-use PHPZlc\Kernel\Doctrine\ORM\RuleColumn\RuleColumn;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
 
 /**
  * The ObjectHydrator constructs an object graph out of an SQL result set.

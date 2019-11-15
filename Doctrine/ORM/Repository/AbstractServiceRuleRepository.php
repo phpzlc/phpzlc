@@ -5,21 +5,21 @@
  * Date: 2019/8/27
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Repository;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
-use PHPZlc\Kernel\Doctrine\ORM\Repository\OtherField\Field;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rule;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rules;
-use PHPZlc\Kernel\Doctrine\ORM\RuleColumn\ClassRuleMetaData;
-use PHPZlc\Kernel\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
-use PHPZlc\Kernel\Doctrine\ORM\RuleColumn\RuleColumn;
-use PHPZlc\Kernel\Doctrine\ORM\SQLParser\SQLParser;
-use PHPZlc\Kernel\Doctrine\ORM\SQLParser\SQLSelectColumn;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Doctrine\ORM\Repository\OtherField\Field;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaData;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
+use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLParser;
+use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLSelectColumn;
 use PHPZlc\Validate\Validate;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;

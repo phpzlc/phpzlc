@@ -1,5 +1,5 @@
 <?php
-namespace PHPZlc\Kernel\Abnormal;
+namespace PHPZlc\PHPZlc\Abnormal;
 
 class Errors
 {

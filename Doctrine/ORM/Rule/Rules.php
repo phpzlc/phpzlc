@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPZlc\Kernel\Doctrine\ORM\Rule;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule;
 
 class Rules
 {

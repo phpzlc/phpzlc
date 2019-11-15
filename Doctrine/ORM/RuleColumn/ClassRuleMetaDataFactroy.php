@@ -5,7 +5,7 @@
  * Date: 2019/8/9
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\RuleColumn;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn;
 
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;

@@ -5,15 +5,15 @@
  * Date: 2019/8/20
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\SQLParser;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\SQLParser;
 
 use Doctrine\ORM\QueryBuilder;
 use PhpMyAdmin\SqlParser\Parser;
 use PhpMyAdmin\SqlParser\Statements\SelectStatement;
 use PhpMyAdmin\SqlParser\Utils\Query;
 use PHPSQLParser\PHPSQLParser;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
-use PHPZlc\Kernel\Doctrine\ORM\Untils\SQLHandle;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Doctrine\ORM\Untils\SQLHandle;
 
 class SQLParser
 {

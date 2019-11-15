@@ -5,9 +5,9 @@
  * Date: 2019/8/20
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\SQLParser;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\SQLParser;
 
-use PHPZlc\Kernel\Doctrine\ORM\Untils\SQLHandle;
+use PHPZlc\PHPZlc\Doctrine\ORM\Untils\SQLHandle;
 
 class SQLSelectColumn
 {

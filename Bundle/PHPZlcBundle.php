@@ -5,7 +5,7 @@
  * Date: 2019/7/18
  */
 
-namespace PHPZlc\Kernel\Bundle;
+namespace PHPZlc\PHPZlc\Bundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

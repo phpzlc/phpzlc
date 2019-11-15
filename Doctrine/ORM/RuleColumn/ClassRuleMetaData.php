@@ -5,12 +5,12 @@
  * Date: 2019/8/8
  */
 
-namespace PHPZlc\Kernel\Doctrine\ORM\RuleColumn;
+namespace PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use PHPZlc\Kernel\Abnormal\PHPZlcException;
-use PHPZlc\Kernel\Doctrine\ORM\Rule\Rule;
+use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 
 class ClassRuleMetaData
 {
@@ -213,7 +213,7 @@ class ClassRuleMetaData
         $reflClass = new \ReflectionClass($classMetadata->getName());
 
         foreach ($reflClass->getProperties() as $property => $reflectionProperty) {
-            $propertyOuterColumnAnnotation = $reader->getPropertyAnnotation($reflectionProperty, \PHPZlc\Kernel\Doctrine\ORM\Mapping\OuterColumn::class);
+            $propertyOuterColumnAnnotation = $reader->getPropertyAnnotation($reflectionProperty, \PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn::class);
             if(!empty($propertyOuterColumnAnnotation)){
                 $this->ruleColumns[$reflectionProperty->getName()] = new RuleColumn(
                     $propertyOuterColumnAnnotation->name,
@@ -228,7 +228,7 @@ class ClassRuleMetaData
 
             $propertyAnnotations = $reader->getPropertyAnnotations($reflectionProperty);
             foreach ($propertyAnnotations as $propertyAnnotation){
-                if($propertyAnnotation instanceof \PHPZlc\Kernel\Doctrine\ORM\Mapping\AddRule){
+                if($propertyAnnotation instanceof \PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule){
                    if(in_array($propertyAnnotation->name, Rule::$defRule)){
                        throw new PHPZlcException('设置规则不能为默认规则');
                    }

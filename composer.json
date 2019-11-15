@@ -1,5 +1,5 @@
 {
-    "name": "phpzlc/kernel",
+    "name": "phpzlc/phpzcl",
     "description": "",
     "license": "proprietary",
     "type": "symfony-bundle",
@@ -15,11 +15,16 @@
     ],
     "autoload": {
         "psr-4": {
-            "PHPZlc\\Kernel\\": [""]
+            "PHPZlc\\PHPZlc\\": [""]
         }
     },
     "require": {
         "php": ">=7.1",
         "phpmyadmin/sql-parser": "^5.0"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": "true"
+        }
     }
 }
