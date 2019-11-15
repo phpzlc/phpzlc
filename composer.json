@@ -21,9 +21,5 @@
     "require": {
         "php": ">=7.1",
         "phpmyadmin/sql-parser": "^5.0"
-
-    },
-    "require-dev": {
-        "composer/composer": "1.6.3"
     }
 }
