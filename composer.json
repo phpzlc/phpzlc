@@ -2,9 +2,9 @@
     "name": "phpzlc/phpzcl",
     "description": "",
     "license": "proprietary",
-    "type": "symfony-bundle",
+    "type": "library",
     "keywords": [
-        "phpzlc", "symfony", "kernel"
+        "phpzlc", "symfony"
     ],
     "authors": [
         {
@@ -21,10 +21,5 @@
     "require": {
         "php": ">=7.1",
         "phpmyadmin/sql-parser": "^5.0"
-    },
-    "extra": {
-        "symfony": {
-            "allow-contrib": "true"
-        }
     }
 }
