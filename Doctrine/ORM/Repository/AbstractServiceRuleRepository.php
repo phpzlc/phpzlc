@@ -20,6 +20,7 @@ use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
 use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
 use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLParser;
 use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLSelectColumn;
+use PHPZlc\PHPZlc\Doctrine\ORM\Untils\Str;
 use PHPZlc\Validate\Validate;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;
@@ -570,6 +571,16 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
     }
 
-    protected abstract function toArray($entity, array $params) : array;
+    protected function toArray($entity, array $params): array
+    {
+        $data = [];
+
+        foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
+            $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
+            $data[$ruleColumn->name] = $entity->$methodName();
+        }
+
+        return $data;
+    }
 
 }

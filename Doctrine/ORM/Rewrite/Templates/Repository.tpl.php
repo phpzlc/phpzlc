@@ -43,6 +43,6 @@ class <?= $class_name; ?> extends AbstractServiceEntityRepository<?= $with_passw
     */
     protected function toArray($entity, array $params): array
     {
-        // TODO: Implement toArray() method.
+        return parent::toArray($entity, $params);
     }
 }

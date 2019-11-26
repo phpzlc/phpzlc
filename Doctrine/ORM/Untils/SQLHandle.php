@@ -12,7 +12,7 @@ class SQLHandle
     /**
      * 解析SQL中的字段SQL 解析目标为 *.* 例如 sql_pre.name
      *
-     * @param $fieldSql
+     * @param $sql
      * @return array
      */
     public static function searchField($sql)
