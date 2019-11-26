@@ -354,7 +354,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
             $ServiceRuleRepository = $this->getServiceRuleRepository($rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $classRuleMetadata->getClassMetadata()->getName());
 
-            if (array_key_exists($rule->getName(), $ServiceRuleRepository->registerRules)) {
+            if (array_key_exists($rule->getSuffixName(), $ServiceRuleRepository->registerRules)) {
                 $ServiceRuleRepository->ruleRewrite($rule, $rules, $resultSetMappingBuilder);
             } else {
                 $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName());
