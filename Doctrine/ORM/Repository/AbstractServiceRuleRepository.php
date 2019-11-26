@@ -164,7 +164,6 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      *
      * @param $rule_suffix_name
      * @param $rule_description
-     * @return mixed
      */
     final protected function registerCoverRule($rule_suffix_name, $rule_description = null)
     {
@@ -177,6 +176,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 if (strpos($rule_suffix_name, $aiRule) !== false) {
                     $suffix_name = rtrim($rule_suffix_name, $aiRule);
                     $ai_rule_name = $aiRule;
+                    break;
                 }
             }
             if(!empty($suffix_name)){
@@ -571,6 +571,46 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
             return $res;
         }
+    }
+
+    /**
+     * 规则匹配
+     *
+     * @param Rule $currentRule
+     * @param $rule_suffix_name
+     * @return bool
+     */
+    final protected function ruleMatch(Rule $currentRule, $rule_suffix_name)
+    {
+        if($currentRule->getSuffixName() == $rule_suffix_name){
+            return true;
+        }
+
+        $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($currentRule->getSuffixName());
+
+        if(!empty($ruleColumn)){
+            if($ruleColumn->name == $rule_suffix_name ||  $ruleColumn->propertyName == $rule_suffix_name){
+                return true;
+            }
+        }
+
+        $suffix_name = '';
+        $ai_rule_name = '';
+        foreach (Rule::getAllAIRule() as $aiRule) {
+            if (strpos($currentRule->getSuffixName(), $aiRule) !== false) {
+                $suffix_name = rtrim($currentRule->getSuffixName(), $aiRule);
+                $ai_rule_name = $aiRule;
+                break;
+            }
+        }
+        if(!empty($suffix_name)){
+            $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($suffix_name);
+            if($ruleColumn->name . $ai_rule_name == $rule_suffix_name || $ruleColumn->propertyName . $ai_rule_name == $rule_suffix_name){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function toArray($entity, array $params): array
