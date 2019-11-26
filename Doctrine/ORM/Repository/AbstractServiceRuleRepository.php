@@ -439,25 +439,6 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
     }
 
-    protected function ruleNamePijiao($ruleName, $ruleSuffixname)
-    {
-        if($ruleName == $suffixname){
-            return true;
-        }
-
-        $ruleColumn =  $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($ruleName);
-
-        if(empty($ruleColumn)){
-            return false;
-        }
-
-        if($ruleColumn->propertyName == $suffixname || $ruleColumn->name == $suffixname){
-            return true;
-        }
-
-        return false;
-    }
-
     /**
      * @param string $pre
      * @param ResultSetMappingBuilder $resultSetMappingBuilder
@@ -554,7 +535,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
 #################################   工具 Result Serialization ##################################
 
-    public function arraySerialization($result, $decoratorMethodName = 'toArray', $decoratorMethodParams = [])
+    final public function arraySerialization($result, $decoratorMethodName = 'toArray', $decoratorMethodParams = [])
     {
         if(empty($result)){
             return [];
