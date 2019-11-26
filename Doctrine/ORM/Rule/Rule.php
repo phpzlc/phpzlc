@@ -272,4 +272,9 @@ class Rule
 
         $this->name = $this->pre . '.' . $this->suffixName;
     }
+
+    public static function getAllAIRule() : array
+    {
+        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST];
+    }
 }

@@ -162,13 +162,34 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     /**
      * 注册覆盖规则
      *
-     * @param $rule_name
+     * @param $rule_suffix_name
      * @param $rule_description
      * @return mixed
      */
-    protected function registerCoverRule($rule_name, $rule_description = null)
+    final protected function registerCoverRule($rule_suffix_name, $rule_description = null)
     {
-        return $this->registerRules[$rule_name] = $rule_description;
+        $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($rule_suffix_name);
+
+        if(empty($ruleColumn)) {
+            $suffix_name = '';
+            $ai_rule_name = '';
+            foreach (Rule::getAllAIRule() as $aiRule) {
+                if (strpos($rule_suffix_name, $aiRule) !== false) {
+                    $suffix_name = rtrim($rule_suffix_name, $aiRule);
+                    $ai_rule_name = $aiRule;
+                }
+            }
+            if(!empty($suffix_name)){
+                $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($suffix_name);
+                $this->registerRules[$ruleColumn->propertyName . $ai_rule_name] = $rule_description;
+                $this->registerRules[$ruleColumn->name . $ai_rule_name] = $rule_description;
+            }else{
+                $this->registerRules[$rule_suffix_name] = $rule_description;
+            }
+        }else{
+            $this->registerRules[$ruleColumn->propertyName] = $rule_description;
+            $this->registerRules[$ruleColumn->name] = $rule_description;
+        }
     }
 
     /**
@@ -176,7 +197,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      *
      * @param Rule $rule
      */
-    protected function registerNecessaryRule(Rule $rule)
+    final protected function registerNecessaryRule(Rule $rule)
     {
         if(empty($this->necessaryRules)){
             $this->necessaryRules = new Rules();
