@@ -21,6 +21,7 @@
 
 namespace Doctrine\ORM\Internal\Hydration;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\UnitOfWork;
 use PDO;
 use Doctrine\ORM\Mapping\ClassMetadata;
