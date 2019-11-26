@@ -28,6 +28,8 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Proxy\Proxy;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
+use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
 
 /**
  * The ObjectHydrator constructs an object graph out of an SQL result set.
@@ -272,7 +274,7 @@ class ObjectHydrator extends AbstractHydrator
 
         $this->_hints['fetchAlias'] = $dqlAlias;
 
-        //重写 将表格外字段加入
+        //重写 将表外字段加入
         $entity = $this->_uow->createEntity($className, $data, $this->_hints);
         $classRuleMetaData = ClassRuleMetaDataFactroy::getClassRuleMetadata($this->_em->getClassMetadata($className));
 
