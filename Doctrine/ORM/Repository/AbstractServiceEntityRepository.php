@@ -38,7 +38,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->getSql();
         $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);
 
-        return $query->getResult('RuleObjectHydrator');
+        return $query->getResult();
     }
 
     public function findLatestOne(Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
@@ -47,7 +47,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->getSql();
         $query = $this->_em->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
 
-        $result = $query->getResult('RuleObjectHydrator');
+        $result = $query->getResult();
 
         if(!empty($result)){
             $result = $result[0];
@@ -62,7 +62,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->getSql();
         $query = $this->_em->createNativeQuery($this->sql . " LIMIT " . ($page - 1) . ", {$rows}", $this->runResultSetMappingBuilder);
 
-        return $query->getResult('RuleObjectHydrator');
+        return $query->getResult();
     }
 
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
@@ -98,7 +98,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->getSql();
         echo $this->sql;
         $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);
-        dump($query->getResult('RuleObjectHydrator'));
+        dump($query->getResult());
         dump($this->getEntityManager()->getConnection()->fetchAll($this->sql));
     }
 }

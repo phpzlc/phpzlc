@@ -14,13 +14,13 @@
  *
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
+ * <http://www.doctrine-project.org>
+ *
+ *
  */
 
-namespace PHPZlc\PHPZlc\Doctrine\ORM\Hydration;
+namespace Doctrine\ORM\Internal\Hydration;
 
-use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
-use Doctrine\ORM\Internal\Hydration\HydrationException;
 use Doctrine\ORM\UnitOfWork;
 use PDO;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -28,137 +28,21 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Proxy\Proxy;
-use Doctrine\DBAL\Types\Type;
-use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
-use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
 
 /**
  * The ObjectHydrator constructs an object graph out of an SQL result set.
  *
  * Internal note: Highly performance-sensitive code.
  *
+ * 该类从phpzlc/phpzlc复制过来的；原类代码被phpzlc/phpzlc在保留原有功能的基础上加入了代码；新增代码文件内检索 //重写
+ *
  * @since  2.0
  * @author Roman Borschel <roman@code-factory.org>
  * @author Guilherme Blanco <guilhermeblanoc@hotmail.com>
  * @author Fabio B. Silva <fabio.bat.silva@gmail.com>
  */
-class RuleObjectHydrator extends AbstractHydrator
+class ObjectHydrator extends AbstractHydrator
 {
-    public function hydrateColumnInfo($key)
-    {
-        if (isset($this->_cache[$key])) {
-            return $this->_cache[$key];
-        }
-
-        switch (true) {
-            // NOTE: Most of the times it's a field mapping, so keep it first!!!
-            case (isset($this->_rsm->fieldMappings[$key])):
-                $classMetadata = $this->getClassMetadata($this->_rsm->declaringClasses[$key]);
-                $fieldName     = $this->_rsm->fieldMappings[$key];
-                if(isset($classMetadata->fieldMappings[$fieldName])) {
-                    $fieldMapping = $classMetadata->fieldMappings[$fieldName];
-                    $ownerMap = $this->_rsm->columnOwnerMap[$key];
-                    $columnInfo = [
-                        'isIdentifier' => \in_array($fieldName, $classMetadata->identifier, true),
-                        'fieldName' => $fieldName,
-                        'type' => Type::getType($fieldMapping['type']),
-                        'dqlAlias' => $ownerMap,
-                    ];
-
-                }else {
-                    // 重写 这个判断用于实现表外字段
-                    $ruleColumn = ClassRuleMetaDataFactroy::getClassRuleMetadata($classMetadata)->getRuleColumnOfPropertyName($fieldName);
-                    $ownerMap = $this->_rsm->columnOwnerMap[$key];
-                    if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT) {
-                        $columnInfo = [
-                            'isIdentifier' => false,
-                            'fieldName' => $ruleColumn->propertyName,
-                            'type' => Type::getType($ruleColumn->type),
-                            'dqlAlias' => $ownerMap
-                        ];
-                    }else{
-                        return null;
-                    }
-                }
-
-                // the current discriminator value must be saved in order to disambiguate fields hydration,
-                // should there be field name collisions
-                if ($classMetadata->parentClasses && isset($this->_rsm->discriminatorColumns[$ownerMap])) {
-                    return $this->_cache[$key] = \array_merge(
-                        $columnInfo,
-                        [
-                            'discriminatorColumn' => $this->_rsm->discriminatorColumns[$ownerMap],
-                            'discriminatorValue' => $classMetadata->discriminatorValue,
-                            'discriminatorValues' => $this->getDiscriminatorValues($classMetadata),
-                        ]
-                    );
-                }
-
-                return $this->_cache[$key] = $columnInfo;
-
-            case (isset($this->_rsm->newObjectMappings[$key])):
-                // WARNING: A NEW object is also a scalar, so it must be declared before!
-                $mapping = $this->_rsm->newObjectMappings[$key];
-
-                return $this->_cache[$key] = [
-                    'isScalar'             => true,
-                    'isNewObjectParameter' => true,
-                    'fieldName'            => $this->_rsm->scalarMappings[$key],
-                    'type'                 => Type::getType($this->_rsm->typeMappings[$key]),
-                    'argIndex'             => $mapping['argIndex'],
-                    'objIndex'             => $mapping['objIndex'],
-                    'class'                => new \ReflectionClass($mapping['className']),
-                ];
-
-            case (isset($this->_rsm->scalarMappings[$key])):
-                return $this->_cache[$key] = [
-                    'isScalar'  => true,
-                    'fieldName' => $this->_rsm->scalarMappings[$key],
-                    'type'      => Type::getType($this->_rsm->typeMappings[$key]),
-                ];
-
-            case (isset($this->_rsm->metaMappings[$key])):
-                // Meta column (has meaning in relational schema only, i.e. foreign keys or discriminator columns).
-                $fieldName = $this->_rsm->metaMappings[$key];
-                $dqlAlias  = $this->_rsm->columnOwnerMap[$key];
-                $type      = isset($this->_rsm->typeMappings[$key])
-                    ? Type::getType($this->_rsm->typeMappings[$key])
-                    : null;
-
-                // Cache metadata fetch
-                $this->getClassMetadata($this->_rsm->aliasMap[$dqlAlias]);
-
-                return $this->_cache[$key] = [
-                    'isIdentifier' => isset($this->_rsm->isIdentifierColumn[$dqlAlias][$key]),
-                    'isMetaColumn' => true,
-                    'fieldName'    => $fieldName,
-                    'type'         => $type,
-                    'dqlAlias'     => $dqlAlias,
-                ];
-        }
-
-        // this column is a left over, maybe from a LIMIT query hack for example in Oracle or DB2
-        // maybe from an additional column that has not been defined in a NativeQuery ResultSetMapping.
-        return null;
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getDiscriminatorValues(ClassMetadata $classMetadata) : array
-    {
-        $values = array_map(
-            function (string $subClass) : string {
-                return (string) $this->getClassMetadata($subClass)->discriminatorValue;
-            },
-            $classMetadata->subClasses
-        );
-
-        $values[] = (string) $classMetadata->discriminatorValue;
-
-        return $values;
-    }
-
     /**
      * @var array
      */
@@ -323,7 +207,7 @@ class RuleObjectHydrator extends AbstractHydrator
         } else if (
             isset($this->_hints[Query::HINT_REFRESH]) ||
             isset($this->_hints['fetched'][$parentDqlAlias][$fieldName]) &&
-            ! $value->isInitialized()
+             ! $value->isInitialized()
         ) {
             // Is already PersistentCollection, but either REFRESH or FETCH-JOIN and UNINITIALIZED!
             $value->setDirty(false);
@@ -421,8 +305,8 @@ class RuleObjectHydrator extends AbstractHydrator
 
             foreach ($class->identifier as $fieldName) {
                 $idHash .= ' ' . (isset($class->associationMappings[$fieldName])
-                        ? $data[$class->associationMappings[$fieldName]['joinColumns'][0]['name']]
-                        : $data[$fieldName]);
+                    ? $data[$class->associationMappings[$fieldName]['joinColumns'][0]['name']]
+                    : $data[$fieldName]);
             }
 
             return $this->_uow->tryGetByIdHash(ltrim($idHash), $class->rootEntityName);
@@ -555,7 +439,7 @@ class RuleObjectHydrator extends AbstractHydrator
                             $this->resultPointers[$dqlAlias] = $reflFieldValue[$index];
                         }
                     } else if ( ! $reflFieldValue) {
-                        $reflFieldValue = $this->initRelatedCollection($parentObject, $parentClass, $relationField, $parentAlias);
+                        $this->initRelatedCollection($parentObject, $parentClass, $relationField, $parentAlias);
                     } else if ($reflFieldValue instanceof PersistentCollection && $reflFieldValue->isInitialized() === false) {
                         $reflFieldValue->setInitialized(true);
                     }
@@ -722,5 +606,103 @@ class RuleObjectHydrator extends AbstractHydrator
         $aliases             = array_keys($this->identifierMap);
 
         $this->identifierMap = array_fill_keys($aliases, []);
+    }
+
+    public function hydrateColumnInfo($key)
+    {
+        if (isset($this->_cache[$key])) {
+            return $this->_cache[$key];
+        }
+
+        switch (true) {
+            // NOTE: Most of the times it's a field mapping, so keep it first!!!
+            case (isset($this->_rsm->fieldMappings[$key])):
+                $classMetadata = $this->getClassMetadata($this->_rsm->declaringClasses[$key]);
+                $fieldName     = $this->_rsm->fieldMappings[$key];
+                if(isset($classMetadata->fieldMappings[$fieldName])) {
+                    $fieldMapping = $classMetadata->fieldMappings[$fieldName];
+                    $ownerMap = $this->_rsm->columnOwnerMap[$key];
+                    $columnInfo = [
+                        'isIdentifier' => \in_array($fieldName, $classMetadata->identifier, true),
+                        'fieldName' => $fieldName,
+                        'type' => Type::getType($fieldMapping['type']),
+                        'dqlAlias' => $ownerMap,
+                    ];
+
+                }else {
+                    // 重写 这个判断用于实现表外字段
+                    $ruleColumn = ClassRuleMetaDataFactroy::getClassRuleMetadata($classMetadata)->getRuleColumnOfPropertyName($fieldName);
+                    $ownerMap = $this->_rsm->columnOwnerMap[$key];
+                    if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT) {
+                        $columnInfo = [
+                            'isIdentifier' => false,
+                            'fieldName' => $ruleColumn->propertyName,
+                            'type' => Type::getType($ruleColumn->type),
+                            'dqlAlias' => $ownerMap
+                        ];
+                    }else{
+                        return null;
+                    }
+                }
+
+                // the current discriminator value must be saved in order to disambiguate fields hydration,
+                // should there be field name collisions
+                if ($classMetadata->parentClasses && isset($this->_rsm->discriminatorColumns[$ownerMap])) {
+                    return $this->_cache[$key] = \array_merge(
+                        $columnInfo,
+                        [
+                            'discriminatorColumn' => $this->_rsm->discriminatorColumns[$ownerMap],
+                            'discriminatorValue' => $classMetadata->discriminatorValue,
+                            'discriminatorValues' => $this->getDiscriminatorValues($classMetadata),
+                        ]
+                    );
+                }
+
+                return $this->_cache[$key] = $columnInfo;
+
+            case (isset($this->_rsm->newObjectMappings[$key])):
+                // WARNING: A NEW object is also a scalar, so it must be declared before!
+                $mapping = $this->_rsm->newObjectMappings[$key];
+
+                return $this->_cache[$key] = [
+                    'isScalar'             => true,
+                    'isNewObjectParameter' => true,
+                    'fieldName'            => $this->_rsm->scalarMappings[$key],
+                    'type'                 => Type::getType($this->_rsm->typeMappings[$key]),
+                    'argIndex'             => $mapping['argIndex'],
+                    'objIndex'             => $mapping['objIndex'],
+                    'class'                => new \ReflectionClass($mapping['className']),
+                ];
+
+            case (isset($this->_rsm->scalarMappings[$key])):
+                return $this->_cache[$key] = [
+                    'isScalar'  => true,
+                    'fieldName' => $this->_rsm->scalarMappings[$key],
+                    'type'      => Type::getType($this->_rsm->typeMappings[$key]),
+                ];
+
+            case (isset($this->_rsm->metaMappings[$key])):
+                // Meta column (has meaning in relational schema only, i.e. foreign keys or discriminator columns).
+                $fieldName = $this->_rsm->metaMappings[$key];
+                $dqlAlias  = $this->_rsm->columnOwnerMap[$key];
+                $type      = isset($this->_rsm->typeMappings[$key])
+                    ? Type::getType($this->_rsm->typeMappings[$key])
+                    : null;
+
+                // Cache metadata fetch
+                $this->getClassMetadata($this->_rsm->aliasMap[$dqlAlias]);
+
+                return $this->_cache[$key] = [
+                    'isIdentifier' => isset($this->_rsm->isIdentifierColumn[$dqlAlias][$key]),
+                    'isMetaColumn' => true,
+                    'fieldName'    => $fieldName,
+                    'type'         => $type,
+                    'dqlAlias'     => $dqlAlias,
+                ];
+        }
+
+        // this column is a left over, maybe from a LIMIT query hack for example in Oracle or DB2
+        // maybe from an additional column that has not been defined in a NativeQuery ResultSetMapping.
+        return null;
     }
 }
