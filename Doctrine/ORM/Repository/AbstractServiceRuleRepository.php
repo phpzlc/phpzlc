@@ -556,7 +556,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
 #################################   工具 Result Serialization ##################################
 
-    final public function arraySerialization($result, $decoratorMethodName = 'toArray', $decoratorMethodParams = [])
+    final public function arraySerialization($result, $decoratorMethodName = 'toArray', $decoratorMethodParams = []) : array
     {
         if(empty($result)){
             return [];
@@ -565,6 +565,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         if(is_object($result)){
             return $this->$decoratorMethodName($result, $decoratorMethodParams);
         }else{
+            $res = [];
+
             foreach ($result as $key => $value){
                 $res[$key] = $this->$decoratorMethodName($value, $decoratorMethodParams);
             }
@@ -601,7 +603,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      * @param $rule_suffix_name
      * @return bool
      */
-    final protected function ruleMatch(Rule $currentRule, $rule_suffix_name)
+    final protected function ruleMatch(Rule $currentRule, $rule_suffix_name) : bool
     {
         if($currentRule->getSuffixName() == $rule_suffix_name){
             return true;
