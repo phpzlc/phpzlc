@@ -573,6 +573,27 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
     }
 
+    final public function toArray($entity): array
+    {
+        $data = [];
+
+        foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
+            $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
+            $methodReturn = $entity->$methodName();
+            if(is_object($methodReturn)){
+                try {
+                    $data[$ruleColumn->name] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
+                }catch (\Exception $exception){
+                    $data[$ruleColumn->name] = $methodReturn->toArray();
+                }
+            }else{
+                $data[$ruleColumn->name] = $entity->$methodName();
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * 规则匹配
      *
@@ -612,17 +633,4 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
         return false;
     }
-
-    protected function toArray($entity, array $params): array
-    {
-        $data = [];
-
-        foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
-            $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
-            $data[$ruleColumn->name] = $entity->$methodName();
-        }
-
-        return $data;
-    }
-
 }

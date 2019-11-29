@@ -35,14 +35,4 @@ class <?= $class_name; ?> extends AbstractServiceEntityRepository<?= $with_passw
     {
         // TODO: Implement ruleRewrite() method.
     }
-
-    /**
-    * @param <?= $entity_class_name; ?> $entity
-    * @param array $params
-    * @return array
-    */
-    protected function toArray($entity, array $params): array
-    {
-        return parent::toArray($entity, $params);
-    }
 }
