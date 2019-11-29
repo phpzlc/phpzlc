@@ -584,7 +584,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             $methodReturn = $entity->$methodName();
             if(is_object($methodReturn)){
                 try {
-                    $data[$ruleColumn->name] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
+                    $data[$ruleColumn->propertyName] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
                 }catch (\Exception $exception){
                     $data[$ruleColumn->name] = $methodReturn->toArray();
                 }
