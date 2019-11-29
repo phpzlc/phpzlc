@@ -20,7 +20,6 @@
     },
     "require": {
         "php": ">=7.1",
-        "phpmyadmin/sql-parser": "^5.0",
-        "phpzlc/validate": "dev-master"
+        "phpmyadmin/sql-parser": "^5.0"
     }
 }
