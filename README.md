@@ -7,3 +7,5 @@ php知了虫:目前致力于在php及symfony生态基础上深度运用symofny4�
 为更庞大更精细的项目未来提供稳定的预期及更多的支持；
 
 (这是个长期的计划,这是个应用技术的最优化方案的集合，这是架构思想的不断升级)
+
+文档地址: [https://github.com/phpzlc/docs](https://github.com/phpzlc/docs)
