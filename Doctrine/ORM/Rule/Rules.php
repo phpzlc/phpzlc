@@ -27,7 +27,8 @@ class Rules
     }
 
     /**
-     * @param Rules|null|array $rules
+     * @param Rules|array $rules
+     * @return $this|Rules
      */
     public function addRules($rules)
     {
