@@ -13,7 +13,7 @@ class Rule
      * @var array
      */
     public static $defRule = [
-        self::R_SELECT, self::R_JOIN, self::R_WHERE, self::R_ORDER_BY
+        self::R_SELECT, self::R_JOIN, self::R_WHERE, self::R_ORDER_BY, self::R_HIDE_SELECT
     ];
 
     /**
@@ -45,6 +45,11 @@ class Rule
      * Repository 默认规则-select 指定查询内容
      */
     const R_SELECT = 'select';
+
+    /**
+     * Repository 默认规则-select 隐藏查询内容
+     */
+    const R_HIDE_SELECT = 'hide_select';
 
     /**
      * Repository 默认规则-order_by  最高优先级排序

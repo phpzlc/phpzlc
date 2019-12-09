@@ -37,4 +37,15 @@ class SQLHandle
 
         return $arr;
     }
+
+    public static function sqlProcess($sql , $alias)
+    {
+        foreach ($alias as $key => $value){
+            if($key != $value){
+                $sql = str_replace($key . '.', $value . '.', $sql);
+            }
+        }
+
+        return $sql;
+    }
 }

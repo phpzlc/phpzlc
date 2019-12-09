@@ -20,6 +20,7 @@ use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaDataFactroy;
 use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\RuleColumn;
 use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLParser;
 use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLSelectColumn;
+use PHPZlc\PHPZlc\Doctrine\ORM\Untils\SQLHandle;
 use PHPZlc\PHPZlc\Doctrine\ORM\Untils\Str;
 use PHPZlc\Validate\Validate;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
@@ -86,6 +87,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      * @var array
      */
     public $registerRules = [];
+
+    /**
+     * @var array
+     */
+    public $rewriteSQls = [];
 
 ##############################  表属性 start ##################################
 
@@ -181,8 +187,12 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             }
             if(!empty($suffix_name)){
                 $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($suffix_name);
-                $this->registerRules[$ruleColumn->propertyName . $ai_rule_name] = $rule_description;
-                $this->registerRules[$ruleColumn->name . $ai_rule_name] = $rule_description;
+                if(empty($ruleColumn)){
+                    $this->registerRules[$rule_suffix_name] = $rule_description;
+                }else {
+                    $this->registerRules[$ruleColumn->propertyName . $ai_rule_name] = $rule_description;
+                    $this->registerRules[$ruleColumn->name . $ai_rule_name] = $rule_description;
+                }
             }else{
                 $this->registerRules[$rule_suffix_name] = $rule_description;
             }
@@ -206,6 +216,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         $this->necessaryRules->addRule($rule);
     }
 
+    final protected function registerRewriteSql($suffix_name, $sql)
+    {
+        $this->rewriteSQls[$suffix_name] = $sql;
+    }
+
     /**
      * 规则重写
      *
@@ -215,7 +230,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      * @return mixed
      */
     abstract public function ruleRewrite(Rule $currentRule, Rules $rules, ResultSetMappingBuilder $resultSetMappingBuilder);
-    
+
     /**
      * 处理 识别分析在这的sql资源规则资源为SQL自动补充关联；
      */
@@ -240,16 +255,20 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 }
             }
         }
+
         //> 添加必须执行的规则
         foreach ($cloneResultSetMappingBuilder->aliasMap as $pre => $entity){
             $serviceRuleRepository = $this->getServiceRuleRepository($pre, $entity);
             if(!empty($serviceRuleRepository->necessaryRules)) {
                 foreach ($serviceRuleRepository->necessaryRules->getRules() as $rule) {
-                    $rule->editPre($serviceRuleRepository->sqlArray['alias']);
+                    if($serviceRuleRepository->sqlArray['alias'] != $this->sqlArray['alias']) {
+                        $rule->editPre($serviceRuleRepository->sqlArray['alias']);
+                    }
                     $rules->addRule($rule);
                 }
             }
         }
+
 
         //> 判断是否存在可以连JOIN但确没有连的规则； 这是自动调用连接规则； [放弃这个设计；用处不大]
 
@@ -258,6 +277,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         $rules->isNotAddRule = true;
         unset($cloneResultSetMappingBuilder);
         unset($sqlArray);
+
         $this->rulesProcess($rules, $resultSetMappingBuilder);
 
         //>> 整理SQL 如果主表主键没有查询则对象不会生成
@@ -265,11 +285,65 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         $isSqlParsers = false;
         foreach ($sqlParser->selectColumnsOfColumn as $column => $SQLSelectColumn){
             if($SQLSelectColumn->name == '*'){
+                if(empty($SQLSelectColumn->fieldPre)){
+                    $SQLSelectColumn->fieldPre = 'sql_pre';
+                }
                 $classRuleMetadata = $this->classRuleMetadataOfPre($SQLSelectColumn->fieldPre, $resultSetMappingBuilder);
                 if(!empty($classRuleMetadata)){
                     $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $classRuleMetadata->getSelectSql([RuleColumn::PT_TYPE_TARGET, RuleColumn::PT_TABLE_IN], $SQLSelectColumn->fieldPre), $this->sqlArray['select']);
                     $isSqlParsers = true;
                 }
+            }else{
+                if(empty($SQLSelectColumn->fieldPre)){
+                    $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, 'sql_pre.' . $SQLSelectColumn->name,  $this->sqlArray['select']);
+                    $isSqlParsers = true;
+                }
+            }
+        }
+
+
+        //移除字段规则
+        if($rules->issetRule(Rule::R_HIDE_SELECT)){
+            $hide_select = explode(',' , $rules->getRule(Rule::R_HIDE_SELECT)->getValue());
+            if(empty($hide_select)){
+                throw new PHPZlcException('R_HIDE_SELECT 规则不能为空');
+            }else{
+                foreach ($hide_select as $hide_value){
+                    $hide_value = trim($hide_value);
+                    if(!empty($hide_value)){
+                        $hide_value_arr = explode('.' , $hide_value);
+                        if(count($hide_value_arr) == 1){
+                            $pre = 'sql_pre';
+                            $hide = $hide_value_arr[0];
+                        }else{
+                            $pre = $hide_value_arr[0];
+                            $hide = $hide_value_arr[1];
+                        }
+                        $classRuleMetadata = $this->classRuleMetadataOfPre($pre, $resultSetMappingBuilder);
+                        if(!empty($classRuleMetadata)){
+                            $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($hide);
+                            if(empty($ruleColumn)){
+                                $this->sqlArray['select'] = str_replace($pre . '.' . $hide, '', $this->sqlArray['select']);
+                            }else{
+                                $this->sqlArray['select'] = str_replace($pre . '.' . $ruleColumn->name, '', $this->sqlArray['select']);
+                                $this->sqlArray['select'] = str_replace($pre . '.' . $ruleColumn->propertyName, '', $this->sqlArray['select']);
+                            }
+                        }else{
+                            $this->sqlArray['select'] = str_replace($pre . '.' . $hide, '', $this->sqlArray['select']);
+                        }
+                    }
+                }
+                //把出现的两个,的部分给移除
+                $this->sqlArray['select'] = preg_replace("/,[\S\s],/",",", $this->sqlArray['select']);
+                $this->sqlArray['select'] = rtrim(trim($this->sqlArray['select']), ',');
+
+                if(empty($this->sqlArray['select'])){
+                    throw new PHPZlcException('R_HIDE_SELECT 移除后 select 不可为空');
+                }
+            }
+
+            if(!$isSqlParsers){
+                $isSqlParsers = true;
             }
         }
 
@@ -347,7 +421,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                     $alias = ['sql_pre' => $pre];
                                 }
 
-                                $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
+                                if(array_key_exists($ruleColumn->name, $this->rewriteSQls)){
+                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSQls[$ruleColumn->name], $alias), $value);
+                                }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSQls)) {
+                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSQls[$ruleColumn->propertyName], $alias), $value);
+                                }else{
+                                    $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
+                                }
                             }
                         }
                     }
@@ -418,7 +498,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                 $ServiceRuleRepository->sqlArray['orderBy'] .= ',' . " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
                             }
                         }
-                    } elseif(strpos($rule->getName(), Rule::RA_JOIN) !== false) {
+                    } elseif (strpos($rule->getName(), Rule::RA_JOIN) !== false) {
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
                         if (!empty($ruleColumn)) {
                             if($ruleColumn->isEntity){
@@ -432,6 +512,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                     $resultSetMappingBuilder->addJoinedEntityFromClassMetadata($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName, array($ruleColumn->targetName => $ruleColumn->name));
                                 }
                             }
+                        }
+                    } elseif (strpos($rule->getName(), Rule::RA_SQL) !== false) {
+                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_SQL);
+                        if(!empty($ruleColumn)) {
+                            $this->registerRewriteSql($ruleColumn->name, $rule->getValue());
                         }
                     }
                 }
@@ -628,8 +713,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
         if(!empty($suffix_name)){
             $ruleColumn = $this->getClassRuleMetadata()->getRuleColumnOfRuleSuffixName($suffix_name);
-            if($ruleColumn->name . $ai_rule_name == $rule_suffix_name || $ruleColumn->propertyName . $ai_rule_name == $rule_suffix_name){
-                return true;
+            if(!empty($ruleColumn)) {
+                if ($ruleColumn->name . $ai_rule_name == $rule_suffix_name || $ruleColumn->propertyName . $ai_rule_name == $rule_suffix_name) {
+                    return true;
+                }
             }
         }
 
