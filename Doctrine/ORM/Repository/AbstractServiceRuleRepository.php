@@ -91,7 +91,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     /**
      * @var array
      */
-    public $rewriteSQls = [];
+    public $rewriteSqls = [];
 
 ##############################  表属性 start ##################################
 
@@ -218,7 +218,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
     final protected function registerRewriteSql($suffix_name, $sql)
     {
-        $this->rewriteSQls[$suffix_name] = $sql;
+        $this->rewriteSqls[$suffix_name] = $sql;
     }
 
     /**
@@ -331,10 +331,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                         }else{
                             $this->sqlArray['select'] = str_replace($pre . '.' . $hide, '', $this->sqlArray['select']);
                         }
+                        //把出现的两个,的部分给移除
+                        $this->sqlArray['select'] = preg_replace("/,[\S\s],/",",", $this->sqlArray['select']);
                     }
                 }
-                //把出现的两个,的部分给移除
-                $this->sqlArray['select'] = preg_replace("/,[\S\s],/",",", $this->sqlArray['select']);
+
                 $this->sqlArray['select'] = rtrim(trim($this->sqlArray['select']), ',');
 
                 if(empty($this->sqlArray['select'])){
@@ -390,7 +391,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                 $joinClassRuleMetadata = $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity));
                                 if ($joinClassRuleMetadata) {
                                     $tar_pre = $this->getAliasIncrease();
-                                    $resultSetMappingBuilder->addJoinedEntityFromClassMetadata($ruleColumn->targetEntity, $tar_pre, $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre  , $ruleColumn->propertyName, array($ruleColumn->targetName => $ruleColumn->name));
+                                    $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $tar_pre, $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre  , $ruleColumn->propertyName, array($ruleColumn->targetName => $ruleColumn->name));
                                 }
                             }
                             if(!empty($tar_pre)) {
@@ -421,10 +422,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                     $alias = ['sql_pre' => $pre];
                                 }
 
-                                if(array_key_exists($ruleColumn->name, $this->rewriteSQls)){
-                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSQls[$ruleColumn->name], $alias), $value);
-                                }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSQls)) {
-                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSQls[$ruleColumn->propertyName], $alias), $value);
+                                if(array_key_exists($ruleColumn->name, $this->rewriteSqls)){
+                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
+                                }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSqls)) {
+                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
                                 }else{
                                     $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
                                 }
@@ -462,7 +463,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
                 if (!empty($ruleColumn)) {
                     //where从句
-                    $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
+                    if(Validate::isRealEmpty($rule->getValue())){
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND ({$ruleColumn->getSqlComment($rule->getPre())} = '' OR {$ruleColumn->getSqlComment($rule->getPre())} is NULL)";
+                    }else {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
+                    }
                 } elseif (!Validate::isRealEmpty($rule->getValue())) {
                     if (strpos($rule->getName(), Rule::RA_CONTRAST) !== false) {
                         //where从句
@@ -499,6 +504,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }
                         }
                     } elseif (strpos($rule->getName(), Rule::RA_JOIN) !== false) {
+                        //JOIN从句
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
                         if (!empty($ruleColumn)) {
                             if($ruleColumn->isEntity){
@@ -514,9 +520,16 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }
                         }
                     } elseif (strpos($rule->getName(), Rule::RA_SQL) !== false) {
+                        //表外字段SQL重写
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_SQL);
                         if(!empty($ruleColumn)) {
                             $this->registerRewriteSql($ruleColumn->name, $rule->getValue());
+                        }
+                    } elseif (strpos($rule->getName(), Rule::RA_NOT_REAL_EMPTY) !== false) {
+                        //WHERE从句 如果匹配值真为空则不生效
+                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_REAL_EMPTY);
+                        if(!empty($ruleColumn)) {
+                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
                         }
                     }
                 }

@@ -1,7 +1,6 @@
 <?php
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule;
 
-use Doctrine\ORM\Mapping as ORM;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Joint\StringJoint;
 
@@ -106,6 +105,11 @@ class Rule
      */
     const RA_SQL = '_sql';
 
+    /**
+     * Repository 智能规则  用于筛选精确匹配 如果匹配值真为空则不生效
+     */
+    const RA_NOT_REAL_EMPTY = '_not_real_empty';
+
 
     /**
      * 规则名称
@@ -180,7 +184,7 @@ class Rule
         }
 
         if($collision == self::JOINT && empty($jointSort)){
-            $jointSort == self::ASC;
+            $jointSort = self::ASC;
         }
 
         if(in_array($name, self::$defRule)){
@@ -280,6 +284,6 @@ class Rule
 
     public static function getAllAIRule() : array
     {
-        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST];
+        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_NOT_REAL_EMPTY];
     }
 }
