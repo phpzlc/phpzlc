@@ -55,7 +55,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'orderBy' => '',
         'finalOrderBy' => '',
         'primaryKey' => '',
-        'aliasIncrease' => ''
+        'aliasIncrease' => '',
+        'falseDeleteField' => ''
     );
 
     public $telSqlArray = array(
@@ -68,6 +69,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'finalOrderBy' => '',
         'primaryKey' => '',
         'aliasIncrease' => 0,
+        'falseDeleteField' => ''
     );
 
     /**
