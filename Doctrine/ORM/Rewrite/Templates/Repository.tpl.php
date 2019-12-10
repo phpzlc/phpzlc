@@ -21,7 +21,7 @@ use PHPZlc\Validate\Validate;
  * @method <?= $entity_class_name; ?>|null    findAssocById($id, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
  * @method <?= $entity_class_name; ?>[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @method <?= $entity_class_name; ?>[]    findAll(Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
- * @method <?= $entity_class_name; ?>n[]    findLimitAll($rows, $page = 1, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+ * @method <?= $entity_class_name; ?>[]    findLimitAll($rows, $page = 1, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
  */
 class <?= $class_name; ?> extends AbstractServiceEntityRepository<?= $with_password_upgrade ? " implements PasswordUpgraderInterface\n" : "\n" ?>
 {
