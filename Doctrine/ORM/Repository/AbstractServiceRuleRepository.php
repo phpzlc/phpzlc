@@ -687,7 +687,25 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     $data[$ruleColumn->name] = $methodReturn->toArray();
                 }
             }else{
-                $data[$ruleColumn->name] = $entity->$methodName();
+                $returnValue = $entity->$methodName();
+
+                switch ($ruleColumn->type){
+                    case 'simple_array':
+                    case 'json_array':
+                        if(empty($returnValue)){
+                            $returnValue = [];
+                        }
+                        break;
+                    case 'boolean':
+                        $returnValue = $returnValue ? 1 : 0;
+                        break;
+                    default:
+                        if(Validate::isRealEmpty($returnValue)){
+                            $returnValue = '';
+                        }
+                }
+
+                $data[$ruleColumn->name] = $returnValue;
             }
         }
 
