@@ -36,6 +36,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         $this->telSqlArray['from'] = $this->getTableName();
         $this->telSqlArray['primaryKey'] = $this->getPrimaryKey();
         $this->telSqlArray['finalOrderBy'] = "sql_pre.{$this->getPrimaryKey()} DESC";
+
+        if($this->getClassRuleMetadata()->hasRuleColumnOfColumnName('is_del')){
+            $this->telSqlArray['falseDeleteField'] = 'is_del';
+        }elseif($this->getClassRuleMetadata()->hasRuleColumnOfColumnName('isDel')){
+            $this->telSqlArray['falseDeleteField'] = 'is_del';
+        }
+
         $this->registerRules();
     }
 
@@ -48,7 +55,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'orderBy' => '',
         'finalOrderBy' => '',
         'primaryKey' => '',
-        'alias_increase' => ''
+        'aliasIncrease' => ''
     );
 
     public $telSqlArray = array(
@@ -60,7 +67,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'orderBy' => '',
         'finalOrderBy' => '',
         'primaryKey' => '',
-        'alias_increase' => 0,
+        'aliasIncrease' => 0,
     );
 
     /**
@@ -153,6 +160,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         if($this->runRules->issetRule(Rule::R_ORDER_BY)){
             $this->sqlArray['orderBy'] =  $this->runRules->getRule(Rule::R_ORDER_BY)->getValue();
         }
+
+        if(!empty($this->sqlArray['falseDeleteField'])){
+            if(!$this->runRules->issetRule(Rule::R_FREED_FALSE_DEL)){
+                $this->sqlArray['where'] .= " AND sql_pre.{$this->sqlArray['falseDeleteField']} = 0";
+            }
+        }
+
 
         //处理
         $this->process($this->runRules, $this->runResultSetMappingBuilder, $aliasChain);
@@ -612,8 +626,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
     private function getAliasIncrease()
     {
-        $aliasIncrease = $this->sqlArray['alias'] . $this->sqlArray['alias_increase'];
-        $this->sqlArray['alias_increase'] ++;
+        $aliasIncrease = $this->sqlArray['alias'] . $this->sqlArray['aliasIncrease'];
+        $this->sqlArray['aliasIncrease'] ++;
         return $aliasIncrease;
     }
 
