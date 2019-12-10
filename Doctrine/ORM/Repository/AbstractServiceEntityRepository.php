@@ -44,6 +44,8 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         if(!empty($result)){
             $result = $result[0];
+        }else{
+            $result = null;
         }
 
         return $result;
@@ -61,6 +63,8 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         if(!empty($result)){
             $result = $result[0];
+        }else{
+            $result = null;
         }
 
         return $result;
@@ -81,6 +85,8 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
             $result = $result[0];
         }elseif (count($result) > 1){
             throw new \Exception('findAssocById 查询值大于 1');
+        }else{
+            $result = null;
         }
 
         return $result;
