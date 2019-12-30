@@ -72,6 +72,9 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
     final public function findAssocById($id, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
+        if(empty($rules)){
+            $rules = new Rules();
+        }
         $rules->addRule(new Rule($this->getPrimaryKey(), $id));
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['orderBy'] = '';
