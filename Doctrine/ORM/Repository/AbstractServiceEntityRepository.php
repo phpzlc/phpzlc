@@ -16,7 +16,13 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
 #################################  查询 start ##################################
 
-    final public function findAll(Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    /**
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return array|mixed
+     */
+    final public function findAll($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->getSql();
@@ -25,7 +31,15 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $query->getResult();
     }
 
-    final public function findLimitAll($rows, $page = 1, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    /**
+     * @param $rows
+     * @param int $page
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return mixed
+     */
+    final public function findLimitAll($rows, $page = 1,$rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->getSql();
@@ -34,7 +48,13 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $query->getResult();
     }
 
-    final public function findAssoc(Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    /**
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return mixed|null
+     */
+    final public function findAssoc($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->getSql();
@@ -51,7 +71,13 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $result;
     }
 
-    final public function findLastAssoc(Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    /**
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return mixed|null
+     */
+    final public function findLastAssoc($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['orderBy'] = 'ORDER BY '. $this->sqlArray['finalOrderBy'];
@@ -70,17 +96,27 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $result;
     }
 
-    final public function findAssocById($id, Rules $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    /**
+     * @param $id
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return mixed|null
+     */
+    final public function findAssocById($id, $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         if(empty($rules)){
             $rules = new Rules();
+        }elseif(is_array($rules)){
+            $rules = new Rules($rules);
         }
+
         $rules->addRule(new Rule($this->getPrimaryKey(), $id));
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['orderBy'] = '';
         $this->getSql();
 
-        $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);
+        $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);;
 
         $result = $query->getResult();
 

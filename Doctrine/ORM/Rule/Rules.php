@@ -144,6 +144,21 @@ class Rules
         }
     }
 
+    /**
+     * @param Rules|array|null $rules
+     * @return Rules
+     */
+    public static function getAIRules($rules = null): Rules
+    {
+        if(empty($rules)){
+            $rules = new Rules();
+        }elseif(is_array($rules)){
+            $rules = new Rules($rules);
+        }
+
+        return $rules;
+    }
+
 
 }
 

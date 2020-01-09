@@ -43,8 +43,10 @@ class Error
      * @param static $group
      * @param array $other
      */
-    public function __construct($msg, $code = 1, $name = '', $value = '', $group = '', $other = array())
+    public function __construct($msg, $code = '$_ENV[API_ERROR_CODE]def(1)', $name = '', $value = '', $group = '', $other = array())
     {
+        $code = array_key_exists('API_ERROR_CODE', $_ENV) ? $_ENV['API_ERROR_CODE'] : 1;
+
         $this->code = $code;
         $this->msg = $msg;
         $this->name = $name;

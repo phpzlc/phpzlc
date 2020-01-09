@@ -1,6 +1,8 @@
 <?php
 namespace PHPZlc\PHPZlc\Abnormal;
 
+use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
+
 class Errors
 {
     /**
@@ -68,5 +70,18 @@ class Errors
     public static function coverError(Error $error)
     {
         array_unshift(static::$errors, $error);
+    }
+
+
+    /**
+     * 异常错误
+     *
+     * @param \Exception $exception
+     */
+    public static function exceptionError(\Exception $exception)
+    {
+        if(!static::isExistError()) {
+            throw new \Exception($exception);
+        }
     }
 }

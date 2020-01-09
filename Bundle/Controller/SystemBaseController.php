@@ -11,9 +11,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 abstract class SystemBaseController extends AbstractController
 {
-    const RETURN_RESOURCE = 'resource';
+    const RETURN_SHOW_RESOURCE = 'SHOW_RESOURCE';
 
-    const RETURN_MESSAGE = 'message';
+    const RETURN_HIDE_RESOURCE = 'HIDE_RESOURCE';
 
     private static $returnType;
 

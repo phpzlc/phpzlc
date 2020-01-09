@@ -168,7 +168,7 @@ class ClassRuleMetaData
             }
         }
 
-        return '';
+        return $this;
     }
 
     public function __construct(ClassMetadata $classMetadata)
@@ -190,22 +190,24 @@ class ClassRuleMetaData
 
         //表关联字段
         foreach ($classMetadata->associationMappings as $associationMapping => $mapping){
-            foreach ($mapping['targetToSourceKeyColumns'] as  $targetName_var => $name_var){
-                $name = $name_var;
-                $targetName = $targetName_var;
+            if(isset($mapping['targetToSourceKeyColumns'])) {
+                foreach ($mapping['targetToSourceKeyColumns'] as $targetName_var => $name_var) {
+                    $name = $name_var;
+                    $targetName = $targetName_var;
+                }
+                $this->ruleColumns[$associationMapping] = new RuleColumn(
+                    $name,
+                    $associationMapping,
+                    '',
+                    'Entity',
+                    RuleColumn::PT_TYPE_TARGET,
+                    'sql_pre.' . $name,
+                    true,
+                    $mapping['targetEntity'],
+                    $mapping['sourceEntity'],
+                    $targetName_var
+                );
             }
-            $this->ruleColumns[$associationMapping] = new RuleColumn(
-                $name,
-                $associationMapping,
-                '',
-                'Entity',
-                RuleColumn::PT_TYPE_TARGET,
-                'sql_pre.' . $name,
-                true,
-                $mapping['targetEntity'],
-                $mapping['sourceEntity'],
-                $targetName_var
-            );
         }
 
         //表之外字段
