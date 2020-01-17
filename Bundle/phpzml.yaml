@@ -1,8 +1,0 @@
-services:
-    phpzlc.file_system:
-        class: PHPZlc\PHPZlc\Bundle\Service\FileSystem\FileSystem
-
-    PHPZlc\PHPZlc\Bundle\EventListener\ApiExceptionListener\ApiExceptionListener:
-        tags:
-            - { name: kernel.event_listener, event: kernel.exception }
-        arguments: ['@service_container']

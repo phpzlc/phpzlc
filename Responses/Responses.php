@@ -70,7 +70,7 @@ class Responses
             );
 
             //记录日志
-            Log::writhLog(' [EXCEPTION_MESSAGE] ' .  $exception->getMessage() .
+            Log::writeLog(' [EXCEPTION_MESSAGE] ' .  $exception->getMessage() .
                 ' [EXCEPTION_FILE] ' .  $exception->getFile() .
                 ' [EXCEPTION_CODE] ' .  $exception->getCode() .
                 ' [EXCEPTION_LINE] '.  $exception->getLine() .
@@ -85,7 +85,7 @@ class Responses
                 return Responses::error($error);
             default:
                 return new Response($networkErrorMessage, $netWorkErrorCode);
-        }
+            }
     }
 
     private static function value($code, $msg, $msgInfo, $data, $type)

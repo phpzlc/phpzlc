@@ -173,7 +173,6 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             }
         }
 
-
         //处理
         $this->process($this->runRules, $this->runResultSetMappingBuilder, $aliasChain);
     }
@@ -288,9 +287,6 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 }
             }
         }
-
-
-        //> 判断是否存在可以连JOIN但确没有连的规则； 这是自动调用连接规则； [放弃这个设计；用处不大]
 
         //>>所有的规则执行好了则进入正式执行
         $this->sqlArray = $sqlArray;
@@ -409,20 +405,41 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                     $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $SQLSelectColumn->cloumn .' as ' . $SQLSelectColumn->name, $this->sqlArray['select']);
                                 }
                             }
-
                         }else{
                             if($ruleColumn->name != $this->getPrimaryKey()) {
                                 $tar_pre = array_search($ruleColumn->targetEntity, $resultSetMappingBuilder->aliasMap);
-                                if (empty($tar_pre)) {
-                                    $joinClassRuleMetadata = $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity));
-                                    if ($joinClassRuleMetadata) {
-                                        $tar_pre = $this->getAliasIncrease();
-                                        $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $tar_pre, $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre, $ruleColumn->propertyName, array($ruleColumn->targetName => $ruleColumn->name));
+                                if(isset($sqlParser->alias[$tar_pre])) {
+                                    if (empty($tar_pre)) {
+                                        $joinClassRuleMetadata = $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity));
+                                        if ($joinClassRuleMetadata) {
+                                            $tar_pre = $this->getAliasIncrease();
+                                            $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $tar_pre, $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre, $ruleColumn->propertyName);
+                                        }
                                     }
+                                    if (!empty($tar_pre)) {
+                                        $resultSetMappingBuilder->addFieldResult(
+                                            $SQLSelectColumn->fieldPre == 'sql_pre' ? $tar_pre : $SQLSelectColumn->fieldPre,
+                                            $SQLSelectColumn->name,
+                                            $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity))->getRuleColumnOfColumnName($ruleColumn->targetName)->propertyName
+                                        );
+                                    }
+                                }else{
+                                    $resultSetMappingBuilder->addMetaResult(
+                                        $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre,
+                                        $SQLSelectColumn->name,
+                                        $SQLSelectColumn->fieldName,
+                                        false,
+                                        $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity))->getRuleColumnOfColumnName($ruleColumn->targetName)->type
+                                    );
                                 }
-                                if (!empty($tar_pre)) {
-                                    $resultSetMappingBuilder->addFieldResult($SQLSelectColumn->fieldPre == 'sql_pre' ? $tar_pre : $SQLSelectColumn->fieldPre, $SQLSelectColumn->name, $this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity)->getFieldName($ruleColumn->targetName));
-                                }
+                            }else{
+                                $resultSetMappingBuilder->addMetaResult(
+                                    $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre,
+                                    $SQLSelectColumn->name,
+                                    $SQLSelectColumn->fieldName,
+                                    true,
+                                    $this->getClassRuleMetadata($this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity))->getRuleColumnOfColumnName($ruleColumn->targetName)->type
+                                );
                             }
                         }
                     }
@@ -502,6 +519,12 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                         if (!empty($ruleColumn)) {
                             $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                         }
+                    } elseif (strpos($rule->getName(), Rule::RA_NOT_IN) !== false) {
+                        //where从句
+                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_IN);
+                        if (!empty($ruleColumn)) {
+                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} not in ({$rule->getValue()}) ";
+                        }
                     } elseif (strpos($rule->getName(), Rule::RA_IN) !== false) {
                         //where从句
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IN);
@@ -542,7 +565,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                 $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $rule->getValue()['alias'] . '.' . $ruleColumn->targetName;
                                 $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
                                 if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
-                                    $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName, array($ruleColumn->targetName => $ruleColumn->name));
+                                    $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName);
                                 }
                             }
                         }

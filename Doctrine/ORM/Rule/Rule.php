@@ -106,6 +106,11 @@ class Rule
     const RA_IN = '_in';
 
     /**
+     * Repository 智能规则 not_info 用于所有字段的查询
+     */
+    const RA_NOT_IN = '_not_in';
+
+    /**
      * Repository 智能规则  用于表外字段的sql重写
      */
     const RA_SQL = '_sql';
@@ -289,6 +294,6 @@ class Rule
 
     public static function getAllAIRule() : array
     {
-        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_NOT_REAL_EMPTY];
+        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_NOT_REAL_EMPTY, self::RA_NOT_IN];
     }
 }

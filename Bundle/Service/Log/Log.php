@@ -19,11 +19,8 @@ class Log
         return dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))) . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . $logFileName;
     }
 
-    /**
-     * @param string|array $content
-     * @param string $logFileName
-     */
-    public static function writhLog($content, $logFileName = '')
+
+    public static function writeLog($content, $logFileName = '')
     {
         if(!is_array($content)){
             $content = array($content);
