@@ -10,6 +10,10 @@ php知了虫:目前致力于在php及symfony生态基础上深度运用symofny4�
 
 文档地址: [https://github.com/phpzlc/docs](https://github.com/phpzlc/docs)
 
+# 发行申明
+
+当前项目尚在开发中,不可用于商业项目,如感兴趣可关注该项目。如有相同意向者请联系作者。
+
 # 分支说明
 
 `master` 最新稳定分支
