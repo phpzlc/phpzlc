@@ -1,6 +1,6 @@
 # phpzlc
 
-php知了虫:目前致力于在php及symfony生态基础上深度运用symofny4框架；
+php知了虫:目前致力于在php及symfony生态基础上深度运用symofny4及以上版本框架；
 
 以实现对于项目资源和代码结构统一而清晰的认知；从而实现知行合一的编码自信；
 
@@ -9,6 +9,10 @@ php知了虫:目前致力于在php及symfony生态基础上深度运用symofny4�
 (这是个长期的计划,这是个应用技术的最优化方案的集合，这是架构思想的不断升级)
 
 文档地址: [https://github.com/phpzlc/docs](https://github.com/phpzlc/docs)
+
+# 发行申明
+
+当前项目尚在开发中,不可用于商业项目,如感兴趣可关注该项目。如有相同意向者请联系作者。
 
 # 分支说明
 
