@@ -22,5 +22,8 @@
         "php": "^7.2.5",
         "phpzlc/validate": "*",
         "phpmyadmin/sql-parser": "^5.0"
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "^1.0"
     }
 }
