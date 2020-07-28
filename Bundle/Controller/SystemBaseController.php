@@ -26,4 +26,11 @@ abstract class SystemBaseController extends AbstractController
     {
         return static::$returnType;
     }
+
+    protected function inlet($returnType = SystemBaseController::RETURN_HIDE_RESOURCE, $isLogin = true)
+    {
+        SystemBaseController::setReturnType($returnType);
+
+        return true;
+    }
 }
