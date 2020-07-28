@@ -742,6 +742,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 switch ($ruleColumn->type) {
                     case 'simple_array':
                     case 'json_array':
+                    case 'array':
                         if (empty($returnValue)) {
                             $returnValue = [];
                         }
