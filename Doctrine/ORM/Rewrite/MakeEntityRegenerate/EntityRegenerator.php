@@ -22,6 +22,8 @@ use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\Util\ClassSourceManipulator;
 
 /**
+ * 该类从phpzlc/phpzlc复制过来的；原类代码被phpzlc/phpzlc在保留原有功能的基础上加入了代码；新增代码文件内检索 //重写
+ *
  * @internal
  */
 final class EntityRegenerator
