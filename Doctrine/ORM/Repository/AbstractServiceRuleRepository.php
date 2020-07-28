@@ -739,18 +739,27 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             }else{
                 $returnValue = $entity->$methodName();
 
-                switch ($ruleColumn->type){
+                switch ($ruleColumn->type) {
                     case 'simple_array':
                     case 'json_array':
-                        if(empty($returnValue)){
+                        if (empty($returnValue)) {
                             $returnValue = [];
                         }
                         break;
                     case 'boolean':
                         $returnValue = $returnValue ? 1 : 0;
                         break;
+                    case 'datetime':
+                        $returnValue = $returnValue->format('Y-m-d H:i:s');
+                        break;
+                    case 'date':
+                        $returnValue = $returnValue->format('Y-m-d');
+                        break;
+                    case 'time':
+                        $returnValue = $returnValue->format('H:i:s');
+                        break;
                     default:
-                        if(Validate::isRealEmpty($returnValue)){
+                        if (Validate::isRealEmpty($returnValue)) {
                             $returnValue = '';
                         }
                 }
