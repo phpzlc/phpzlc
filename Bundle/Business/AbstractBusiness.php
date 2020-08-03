@@ -9,6 +9,7 @@ namespace PHPZlc\PHPZlc\Bundle\Business;
 
 
 use Doctrine\DBAL\Connection;
+use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use Psr\Container\ContainerInterface;
 use PHPZlc\PHPZlc\Abnormal\Error;
 use PHPZlc\PHPZlc\Abnormal\Errors;
@@ -49,5 +50,25 @@ abstract class AbstractBusiness extends AbstractController
         }
 
         return true;
+    }
+
+    /**
+     * 网络错误服务
+     *
+     * @param \Exception $exception
+     */
+    final protected function networkError(\Exception $exception)
+    {
+        if(!Errors::isExistError()) {
+            self::$error->setError('系统繁忙，请稍后再试');
+            //记录错误日志
+            Log::writeLog(
+                ' [EXCEPTION_MESSAGE] ' . $exception->getMessage() .
+                ' [ EXCEPTION_FILE ] ' . $exception->getFile() .
+                ' [ EXCEPTION_CODE ] ' . $exception->getCode() .
+                ' [ EXCEPTION_LINE ] '. $exception->getLine() .
+                ' [ ERROR ] ' . self::$error->getError()['message']
+            );
+        }
     }
 }
