@@ -168,7 +168,7 @@ class ClassRuleMetaData
             }
         }
 
-        return $this;
+        return '';
     }
 
     public function __construct(ClassMetadata $classMetadata)
