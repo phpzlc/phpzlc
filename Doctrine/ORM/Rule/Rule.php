@@ -86,6 +86,11 @@ class Rule
     const RA_CONTRAST = '_contrast';
 
     /**
+     * Repository 智能规则 比较  用于所有字段的条件  ['>', '12']  规则内容第一项为运算符 第二项为比较内容
+     */
+    const RA_CONTRAST_2 = '_twoContrast';
+
+    /**
      *  Repository 智能规则 用于连表
      */
     const RA_JOIN = '_join';
@@ -294,6 +299,6 @@ class Rule
 
     public static function getAllAIRule() : array
     {
-        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_NOT_REAL_EMPTY, self::RA_NOT_IN];
+        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_CONTRAST_2, self::RA_NOT_REAL_EMPTY, self::RA_NOT_IN];
     }
 }

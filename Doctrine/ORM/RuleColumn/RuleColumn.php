@@ -74,13 +74,16 @@ class RuleColumn
      */
     public $sourceEntity;
 
-
+    /**
+     * @var boolean
+     */
+    public $nullable;
+    
     /**
      * @var string
      */
     public $targetName;
-
-
+    
     /**
      * @var Rules
      */
@@ -95,14 +98,13 @@ class RuleColumn
      * @param string $type 类型
      * @param string $propertyType 字段类型
      * @param string $selectSql  查询SQL
-     * @param string|null $whereSql WHERE SQL 不填则自动生成
-     * @param string|null $orderBySql WHERE SQL 不填则自动生成
+     * @param string $nullable 是否不能为空
      * @param boolean $isEntity  是否为Entity
      * @param string|null $targetEntity  isEntity为true必填  关联至EntutyName
      * @param string| null $sourceEntity isEntity为true必填  由EntutyName关联
      * @param string|null $targetName isEntity为true必填 关联至EntutyName的字段名
      */
-    public function __construct($name, $propertyName, $comment, $type, $propertyType, $sql, $isEntity = false, $targetEntity = null, $sourceEntity = null, $targetName = null)
+    public function __construct($name, $propertyName, $comment, $type, $propertyType, $sql, $nullable, $isEntity = false, $targetEntity = null, $sourceEntity = null, $targetName = null)
     {
         if($propertyName == ''){
             throw new PHPZlcException('属性名不能为空');
@@ -134,6 +136,7 @@ class RuleColumn
         $this->targetEntity = $targetEntity;
         $this->sourceEntity = $sourceEntity;
         $this->targetName = $targetName;
+        $this->nullable = $nullable;
         $this->rules = new Rules();
     }
 

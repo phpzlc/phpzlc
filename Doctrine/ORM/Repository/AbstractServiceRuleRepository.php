@@ -12,6 +12,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
+use PHPZlc\PHPZlc\Bundle\Service\DateTime\DateTime;
 use PHPZlc\PHPZlc\Doctrine\ORM\Repository\OtherField\Field;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
@@ -457,9 +458,9 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     if(!empty($ruleColumn)){
                         foreach ($this->sqlArray as $key => $value){
                             //如果表外字段在select中存在则直接使用select中的字段名;表外字段一般为子查询；直接取字段名可以避免重复子查询
-                            if($key == 'orderBy' && isset($sqlParser->selectColumnsOfColumn[$field])){
-                                $this->sqlArray[$key] = str_replace($field, $sqlParser->selectColumnsOfColumn[$field]->name, $value);
-                            }else{
+//                            if($key == 'orderBy' && isset($sqlParser->selectColumnsOfColumn[$field])){
+//                                $this->sqlArray[$key] = str_replace($field, $sqlParser->selectColumnsOfColumn[$field]->name, $value);
+//                            }else{
                                 if(isset($aliasChainParser[$pre])){
                                     $alias = array_merge($aliasChainParser[$pre], ['sql_pre' => $pre]);
                                 }else{
@@ -472,7 +473,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                     $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
                                 }else{
                                     $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
-                                }
+//                                }
                             }
                         }
                     }
@@ -516,6 +517,12 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     if (strpos($rule->getName(), Rule::RA_CONTRAST) !== false) {
                         //where从句
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST);
+                        if (!empty($ruleColumn)) {
+                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
+                        }
+                    } elseif (strpos($rule->getName(), Rule::RA_CONTRAST_2) !== false){
+                        //where从句
+                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST_2);
                         if (!empty($ruleColumn)) {
                             $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                         }
@@ -730,20 +737,20 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
             $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
             $methodReturn = $entity->$methodName();
-            if(is_object($methodReturn)){
+            if(is_object($methodReturn) && !($methodReturn instanceof \DateTime)){
                 try {
-                    $data[$ruleColumn->propertyName] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
+                    $data[$ruleColumn->name] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
                 }catch (\Exception $exception){
                     $data[$ruleColumn->name] = $methodReturn->toArray();
                 }
             }else{
                 $returnValue = $entity->$methodName();
 
-                switch ($ruleColumn->type) {
+                switch ($ruleColumn->type){
                     case 'simple_array':
                     case 'json_array':
                     case 'array':
-                        if (empty($returnValue)) {
+                        if(empty($returnValue)){
                             $returnValue = [];
                         }
                         break;
@@ -760,7 +767,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                         $returnValue = $returnValue->format('H:i:s');
                         break;
                     default:
-                        if (Validate::isRealEmpty($returnValue)) {
+                        if(Validate::isRealEmpty($returnValue)){
                             $returnValue = '';
                         }
                 }

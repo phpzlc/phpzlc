@@ -42,6 +42,10 @@ abstract class AbstractBusiness extends AbstractController
 
     public function validator($class) : bool
     {
+        if(Errors::isExistError()){
+            return false;
+        }
+
         $errors = self::$validation->validate($class);
 
         if(count($errors) > 0){
@@ -60,14 +64,19 @@ abstract class AbstractBusiness extends AbstractController
     final protected function networkError(\Exception $exception)
     {
         if(!Errors::isExistError()) {
-            self::$error->setError('系统繁忙，请稍后再试');
+            if($_ENV['APP_ENV'] == 'dev'){
+                throw $exception;
+            }
+
+            Errors::setErrorMessage('系统繁忙,请稍后再试');
+
             //记录错误日志
             Log::writeLog(
                 ' [EXCEPTION_MESSAGE] ' . $exception->getMessage() .
                 ' [ EXCEPTION_FILE ] ' . $exception->getFile() .
                 ' [ EXCEPTION_CODE ] ' . $exception->getCode() .
                 ' [ EXCEPTION_LINE ] '. $exception->getLine() .
-                ' [ ERROR ] ' . self::$error->getError()['message']
+                ' [ ERROR ] ' . Errors::getError()->msg
             );
         }
     }

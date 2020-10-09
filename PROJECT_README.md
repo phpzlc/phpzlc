@@ -2,7 +2,9 @@
 
 ## 部署
 
-```shell script
-    chmod -R 777 var
+```shell
+
+sudo chmod -R 777 var/
+
 ```
 

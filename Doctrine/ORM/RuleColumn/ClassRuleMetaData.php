@@ -171,6 +171,17 @@ class ClassRuleMetaData
         return '';
     }
 
+    public function getNullableOfField($fieldName)
+    {
+        if(array_key_exists($fieldName, $this->_class->fieldMappings)){
+            if(array_key_exists('nullable', $this->_class->fieldMappings[$fieldName])){
+                return $this->_class->fieldMappings[$fieldName]['nullable'];
+            }
+        }
+        
+        return false;
+    }
+
     public function __construct(ClassMetadata $classMetadata)
     {
         $this->_class = $classMetadata;
@@ -184,6 +195,7 @@ class ClassRuleMetaData
                 $classMetadata->getTypeOfField($fieldName),
                 RuleColumn::PT_TABLE_IN,
                 'sql_pre.' . $name,
+                $this->getNullableOfField($fieldName),
                 false
             );
         }
@@ -202,6 +214,7 @@ class ClassRuleMetaData
                     'Entity',
                     RuleColumn::PT_TYPE_TARGET,
                     'sql_pre.' . $name,
+                    $this->getNullableOfField($fieldName),
                     true,
                     $mapping['targetEntity'],
                     $mapping['sourceEntity'],
@@ -224,6 +237,7 @@ class ClassRuleMetaData
                     $propertyOuterColumnAnnotation->type,
                     RuleColumn::PT_TABLE_OUT,
                     $propertyOuterColumnAnnotation->sql,
+                    $this->getNullableOfField($fieldName),
                     false
                 );
             }

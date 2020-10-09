@@ -42,8 +42,10 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     final public function findLimitAll($rows, $page = 1,$rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
+
         $this->getSql();
-        $query = $this->_em->createNativeQuery($this->sql . " LIMIT " . ($page - 1) . ", {$rows}", $this->runResultSetMappingBuilder);
+
+        $query = $this->_em->createNativeQuery($this->sql . " LIMIT " . (($page - 1) * $rows) . ", {$rows}", $this->runResultSetMappingBuilder);
 
         return $query->getResult();
     }
@@ -127,5 +129,32 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         }
 
         return $result;
+    }
+
+    /**
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return array|mixed
+     */
+    final public function findCount($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    {
+        $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
+        $this->sqlArray['select'] = 'count(sql_pre.' . $this->getPrimaryKey() .')';
+
+        return $this->_em->getConnection()->fetchColumn($this->getSql());
+    }
+    
+    /**
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return string
+     */
+    final public function findSql($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    {
+        $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
+
+        return $this->getSql();
     }
 }
