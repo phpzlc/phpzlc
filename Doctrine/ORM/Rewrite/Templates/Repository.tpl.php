@@ -3,7 +3,7 @@
 namespace <?= $namespace; ?>;
 
 use <?= $entity_full_class_name; ?>;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Doctrine\ORM\Repository\AbstractServiceEntityRepository;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
