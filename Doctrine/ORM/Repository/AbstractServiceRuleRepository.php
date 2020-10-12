@@ -8,7 +8,7 @@
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
