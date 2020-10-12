@@ -7,9 +7,8 @@
 
 namespace PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn;
 
-
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
 class ClassRuleMetaDataFactroy
 {
