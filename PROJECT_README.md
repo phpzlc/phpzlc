@@ -27,8 +27,8 @@ proxy_send_timeout       900s;
 //数据库配置
 touch .env.local
 vim .env.local
-  APP_ENV=prod  #此项目根据开发环境决定，开发者可以不配
-  DATABASE_URL=mysql://root:root@127.0.0.1:3306/portal_skeleton?serverVersion=5.6  # 数据库配置
+APP_ENV=prod  #此项目根据开发环境决定，开发者可以不配
+DATABASE_URL=mysql://root:root@127.0.0.1:3306/portal_skeleton?serverVersion=5.6  # 数据库配置
 
 //文件夹权限
 mkdir var
