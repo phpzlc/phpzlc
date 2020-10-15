@@ -461,18 +461,18 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 //                            if($key == 'orderBy' && isset($sqlParser->selectColumnsOfColumn[$field])){
 //                                $this->sqlArray[$key] = str_replace($field, $sqlParser->selectColumnsOfColumn[$field]->name, $value);
 //                            }else{
-                                if(isset($aliasChainParser[$pre])){
-                                    $alias = array_merge($aliasChainParser[$pre], ['sql_pre' => $pre]);
-                                }else{
-                                    $alias = ['sql_pre' => $pre];
-                                }
+                            if(isset($aliasChainParser[$pre])){
+                                $alias = array_merge($aliasChainParser[$pre], ['sql_pre' => $pre]);
+                            }else{
+                                $alias = ['sql_pre' => $pre];
+                            }
 
-                                if(array_key_exists($ruleColumn->name, $this->rewriteSqls)){
-                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
-                                }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSqls)) {
-                                    $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
-                                }else{
-                                    $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
+                            if(array_key_exists($ruleColumn->name, $this->rewriteSqls)){
+                                $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
+                            }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSqls)) {
+                                $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
+                            }else{
+                                $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
 //                                }
                             }
                         }
@@ -711,7 +711,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
 #################################   工具 Result Serialization ##################################
 
-    final public function arraySerialization($result, $decoratorMethodName = 'toArray', $decoratorMethodParams = []) : array
+    final public function arraySerialization($result, $decoratorMethodParams = ['level' => 0], $decoratorMethodName = 'toArray') : array
     {
         if(empty($result)){
             return [];
@@ -730,18 +730,31 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
     }
 
-    final public function toArray($entity): array
+    final public function toArray($entity, $params = ['level' => 0]): array
     {
-        $data = [];
+        if(array_key_exists('level', $params)){
+            $params['level'] --;
+        }else{
+            $params['level'] = 0;
+        }
 
         foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
             $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
             $methodReturn = $entity->$methodName();
             if(is_object($methodReturn) && !($methodReturn instanceof \DateTime)){
                 try {
-                    $data[$ruleColumn->name] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn);
+                    if(empty($methodReturn)){
+                        $data[$ruleColumn->propertyName] = null;
+                    }elseif($params['level'] < 0) {
+                        $joinRepository = $this->getEntityManager()->getRepository(get_class($methodReturn));
+                        $joinMethodName = 'get'.Str::asCamelCase($joinRepository->getPrimaryKey());
+                        $data[$ruleColumn->name] = $methodReturn->$joinMethodName();
+                    }else{
+                        $data[$ruleColumn->propertyName] = $this->getEntityManager()->getRepository(get_class($methodReturn))->toArray($methodReturn, $params);
+                    }
                 }catch (\Exception $exception){
-                    $data[$ruleColumn->name] = $methodReturn->toArray();
+                    throw $exception;
+                    $data[$ruleColumn->propertyName] = $methodReturn->toArray();
                 }
             }else{
                 $returnValue = $entity->$methodName();
