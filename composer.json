@@ -21,6 +21,8 @@
     "require": {
         "php": "^7.2.5",
         "phpzlc/validate": "*",
-        "phpmyadmin/sql-parser": "^5.0"
+        "phpmyadmin/sql-parser": "^5.0",
+        "ramsey/uuid": "^4.1",
+        "doctrine/doctrine-fixtures-bundle": "^3.3"
     }
 }
