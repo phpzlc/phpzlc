@@ -24,7 +24,7 @@ use PHPZlc\PHPZlc\Doctrine\ORM\SQLParser\SQLSelectColumn;
 use PHPZlc\PHPZlc\Doctrine\ORM\Untils\SQLHandle;
 use PHPZlc\PHPZlc\Doctrine\ORM\Untils\Str;
 use PHPZlc\Validate\Validate;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;
 use PHPSQLParser\PHPSQLParser;
 
