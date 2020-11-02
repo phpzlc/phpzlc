@@ -771,13 +771,25 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                         $returnValue = $returnValue ? 1 : 0;
                         break;
                     case 'datetime':
-                        $returnValue = $returnValue->format('Y-m-d H:i:s');
+                        if(empty($returnValue)){
+                            $returnValue = '';
+                        }else {
+                            $returnValue = $returnValue->format('Y-m-d H:i:s');
+                        }
                         break;
                     case 'date':
-                        $returnValue = $returnValue->format('Y-m-d');
+                        if(empty($returnValue)){
+                            $returnValue = '';
+                        }else{
+                            $returnValue = $returnValue->format('Y-m-d');
+                        }
                         break;
                     case 'time':
-                        $returnValue = $returnValue->format('H:i:s');
+                        if(empty($returnValue)){
+                            $returnValue = '';
+                        }else{
+                            $returnValue = $returnValue->format('H:i:s');
+                        }
                         break;
                     default:
                         if(Validate::isRealEmpty($returnValue)){
