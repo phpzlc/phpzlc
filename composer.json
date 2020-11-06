@@ -22,6 +22,7 @@
         }
     },
     "require": {
+        "php": ">=7.2.5",
         "symfony/framework-bundle": "4.4.*",
         "phpmyadmin/sql-parser": "^5.0",
         "ramsey/uuid": "^4.1",
