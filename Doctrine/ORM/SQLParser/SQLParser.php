@@ -100,6 +100,8 @@ class SQLParser
      */
     public function getUseFieldsOFPreGrouping()
     {
+        $fields = [];
+
         foreach ($this->useFields as $key => $field) {
             $fields[$field['pre']][$key] = $field;
         }

@@ -157,4 +157,18 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         return $this->getSql();
     }
+
+    final public function findOneBy(array $criteria, array $orderBy = null)
+    {
+        return $this->findAssoc($criteria);
+    }
+
+    final public function find($id, $lockMode = null, $lockVersion = null)
+    {
+        if(is_array($id)){
+            return $this->findAssoc($id);
+        }else{
+            return $this->findAssocById($id);
+        }
+    }
 }

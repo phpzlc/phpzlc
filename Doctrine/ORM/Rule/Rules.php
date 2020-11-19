@@ -75,11 +75,7 @@ class Rules
             }
         }
 
-        if(strpos($rule->getName(), Rule::RA_JOIN) !== false){
-            array_unshift($this->rules, $rule);
-        }else{
-            array_push($this->rules, $rule);
-        }
+        array_push($this->rules, $rule);
 
         $this->rulesCorrection();
 
@@ -106,6 +102,32 @@ class Rules
     public function getRules()
     {
         return $this->rules;
+    }
+
+    public function getJoinRules()
+    {
+        $rules = [];
+
+        foreach ($this->rules as $rule){
+            if(strpos($rule->getName(), Rule::RA_JOIN) !== false) {
+                $rules[] = $rule;
+            }
+        }
+
+        return $rules;
+    }
+
+    public function getNotJoinRules()
+    {
+        $rules = [];
+
+        foreach ($this->rules as $rule){
+            if(strpos($rule->getName(), Rule::RA_JOIN) === false) {
+                $rules[] = $rule;
+            }
+        }
+
+        return $rules;
     }
 
     public function issetRule($rule_name)

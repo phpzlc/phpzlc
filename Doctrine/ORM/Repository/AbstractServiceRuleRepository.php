@@ -13,7 +13,6 @@ use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use PHPZlc\PHPZlc\Bundle\Service\DateTime\DateTime;
-use PHPZlc\PHPZlc\Doctrine\ORM\Repository\OtherField\Field;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
 use PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn\ClassRuleMetaData;
@@ -26,7 +25,6 @@ use PHPZlc\PHPZlc\Doctrine\ORM\Untils\Str;
 use PHPZlc\Validate\Validate;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;
-use PHPSQLParser\PHPSQLParser;
 
 abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 {
@@ -144,7 +142,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 $this->runRules = new Rules($rules);
             }
         }
-
+        
         $this->sql = '';
         $this->sqlArray = $this->telSqlArray;
         $this->runResultSetMappingBuilder->addEntityResult($this->getClassName(), $this->sqlArray['alias']);
@@ -300,24 +298,31 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         //>> 整理SQL 如果主表主键没有查询则对象不会生成
         //> 识别 * 字段  将*替换成具体的字段 如果存在需要重新分析SQL
         $isSqlParsers = false;
+//        dump(($sqlParser->selectColumnsOfColumn));
+//        dump($this->sqlArray);exit;
         foreach ($sqlParser->selectColumnsOfColumn as $column => $SQLSelectColumn){
-            if(empty($SQLSelectColumn->fieldPre)){
-                $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, 'sql_pre.' . $SQLSelectColumn->name,  $this->sqlArray['select']);
-                $SQLSelectColumn->fieldPre = 'sql_pre';
-                $SQLSelectColumn->cloumn = 'sql_pre.' . $SQLSelectColumn->name;
-                $isSqlParsers = true;
-            }
+            if($SQLSelectColumn->isField) {
+                if (empty($SQLSelectColumn->fieldPre)) {
+                    $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, 'sql_pre.' . $SQLSelectColumn->name, $this->sqlArray['select']);
+                    $SQLSelectColumn->fieldPre = 'sql_pre';
+                    $SQLSelectColumn->cloumn = 'sql_pre.' . $SQLSelectColumn->name;
+                    $isSqlParsers = true;
+                }
 
-            if($SQLSelectColumn->name == '*'){
-                $classRuleMetadata = $this->classRuleMetadataOfPre($SQLSelectColumn->fieldPre, $resultSetMappingBuilder);
-                if(!empty($classRuleMetadata)){
-                    if($SQLSelectColumn->name == '*') {
-                        $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $classRuleMetadata->getSelectSql([RuleColumn::PT_TYPE_TARGET, RuleColumn::PT_TABLE_IN], $SQLSelectColumn->fieldPre), $this->sqlArray['select']);
-                        $isSqlParsers = true;
+                if ($SQLSelectColumn->name == '*') {
+                    $classRuleMetadata = $this->classRuleMetadataOfPre($SQLSelectColumn->fieldPre, $resultSetMappingBuilder);
+                    if (!empty($classRuleMetadata)) {
+                        if ($SQLSelectColumn->name == '*') {
+                            $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $classRuleMetadata->getSelectSql([RuleColumn::PT_TYPE_TARGET, RuleColumn::PT_TABLE_IN], $SQLSelectColumn->fieldPre), $this->sqlArray['select']);
+                            $isSqlParsers = true;
+                        }
                     }
                 }
+            }else{
+                //TODO 解决表外字段的聚合使用方法
             }
         }
+
 
         //移除字段规则
         if($rules->issetRule(Rule::R_HIDE_SELECT)){
@@ -488,128 +493,139 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
     private function rulesProcess(Rules $rules, ResultSetMappingBuilder $resultSetMappingBuilder)
     {
-        foreach ($rules->getRules() as $rule) {
-            if (in_array($rule->getName(), Rule::$defRule)) {
-                continue;
-            }
+        foreach ($rules->getJoinRules() as $rule) {
+            $this->ruleProcess($rule, $rules, $resultSetMappingBuilder);
+        }
+        
+        foreach ($rules->getNotJoinRules() as $rule){
+            $this->ruleProcess($rule, $rules, $resultSetMappingBuilder);
+        }
+    }
 
-            $classRuleMetadata = $this->classRuleMetadataOfPre($rule->getPre(), $resultSetMappingBuilder);
+    private function ruleProcess(Rule $rule, Rules $rules, ResultSetMappingBuilder $resultSetMappingBuilder)
+    {
+        if (in_array($rule->getName(), Rule::$defRule)) {
+            return;
+        }
 
-            if(empty($classRuleMetadata)){
-                continue;
-            }
+        $classRuleMetadata = $this->classRuleMetadataOfPre($rule->getPre(), $resultSetMappingBuilder);
 
-            $ServiceRuleRepository = $this->getServiceRuleRepository($rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $classRuleMetadata->getClassMetadata()->getName());
+        if(empty($classRuleMetadata)){
+            return;
+        }
 
-            if (array_key_exists($rule->getSuffixName(), $ServiceRuleRepository->registerRules)) {
-                $ServiceRuleRepository->ruleRewrite($rule, $rules, $resultSetMappingBuilder);
-            } else {
-                $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName());
+        $ServiceRuleRepository = $this->getServiceRuleRepository($rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $classRuleMetadata->getClassMetadata()->getName());
 
-                if (!empty($ruleColumn)) {
+        if (array_key_exists($rule->getSuffixName(), $ServiceRuleRepository->registerRules)) {
+            $ServiceRuleRepository->ruleRewrite($rule, $rules, $resultSetMappingBuilder);
+        } else {
+            $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName());
+
+            if (!empty($ruleColumn)) {
+                //where从句
+                if(Validate::isRealEmpty($rule->getValue())){
+                    $ServiceRuleRepository->sqlArray['where'] .= " AND ({$ruleColumn->getSqlComment($rule->getPre())} = '' OR {$ruleColumn->getSqlComment($rule->getPre())} is NULL)";
+                }else {
+                    $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
+                }
+            } elseif (!Validate::isRealEmpty($rule->getValue())) {
+                if (strpos($rule->getName(), Rule::RA_CONTRAST) !== false) {
                     //where从句
-                    if(Validate::isRealEmpty($rule->getValue())){
-                        $ServiceRuleRepository->sqlArray['where'] .= " AND ({$ruleColumn->getSqlComment($rule->getPre())} = '' OR {$ruleColumn->getSqlComment($rule->getPre())} is NULL)";
-                    }else {
-                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST);
+                    if (!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                     }
-                } elseif (!Validate::isRealEmpty($rule->getValue())) {
-                    if (strpos($rule->getName(), Rule::RA_CONTRAST) !== false) {
-                        //where从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST);
-                        if (!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_CONTRAST_2) !== false){
-                        //where从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST_2);
-                        if (!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_NOT_IN) !== false) {
-                        //where从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_IN);
-                        if (!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} not in ({$rule->getValue()}) ";
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_IN) !== false) {
-                        //where从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IN);
-                        if (!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} in ({$rule->getValue()}) ";
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_IS) !== false) {
-                        //where从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IS);
-                        if (!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} is {$rule->getValue()} ";
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_LIKE) !== false) {
+                } elseif (strpos($rule->getName(), Rule::RA_CONTRAST_2) !== false){
+                    //where从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST_2);
+                    if (!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_NOT_IN) !== false) {
+                    //where从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_IN);
+                    if (!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} not in ({$rule->getValue()}) ";
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_IN) !== false) {
+                    //where从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IN);
+                    if (!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} in ({$rule->getValue()}) ";
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_IS) !== false) {
+                    //where从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IS);
+                    if (!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} is {$rule->getValue()} ";
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_LIKE) !== false) {
+                    if($rule->getValue() != '%%') {
                         //where从句
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_LIKE);
                         if (!empty($ruleColumn)) {
                             $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} LIKE '{$rule->getValue()}' ";
                         }
-                    } elseif (strpos($rule->getName(), Rule::RA_ORDER_BY) !== false) {
-                        //orderBy从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_ORDER_BY);
-                        if (!empty($ruleColumn)) {
-                            if (empty($ServiceRuleRepository->sqlArray['orderBy'])) {
-                                $ServiceRuleRepository->sqlArray['orderBy'] = " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
-                            } else {
-                                $ServiceRuleRepository->sqlArray['orderBy'] .= ',' . " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_ORDER_BY) !== false) {
+                    //orderBy从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_ORDER_BY);
+                    if (!empty($ruleColumn)) {
+                        if (empty($ServiceRuleRepository->sqlArray['orderBy'])) {
+                            $ServiceRuleRepository->sqlArray['orderBy'] = " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
+                        } else {
+                            $ServiceRuleRepository->sqlArray['orderBy'] .= ',' . " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
+                        }
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_JOIN) !== false) {
+                    //JOIN从句
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
+                    if (!empty($ruleColumn)) {
+                        if($ruleColumn->isEntity){
+                            $joinclassRuleMetadata = $this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity);
+                            $type = isset($rule->getValue()['type']) ? $rule->getValue()['type']: ' LEFT JOIN ';
+                            $tableName = isset($rule->getValue()['tableName']) ? $rule->getValue()['tableName'] : $joinclassRuleMetadata->getTableName();
+                            $alias = isset($rule->getValue()['alias']) ? $rule->getValue()['alias'] : die($rule->getName() . '缺少alias');
+                            $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $rule->getValue()['alias'] . '.' . $ruleColumn->targetName;
+                            $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
+                            if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
+                                $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName);
                             }
                         }
-                    } elseif (strpos($rule->getName(), Rule::RA_JOIN) !== false) {
-                        //JOIN从句
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
-                        if (!empty($ruleColumn)) {
-                            if($ruleColumn->isEntity){
-                                $joinclassRuleMetadata = $this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity);
-                                $type = isset($rule->getValue()['type']) ? $rule->getValue()['type']: ' LEFT JOIN ';
-                                $tableName = isset($rule->getValue()['tableName']) ? $rule->getValue()['tableName'] : $joinclassRuleMetadata->getTableName();
-                                $alias = isset($rule->getValue()['alias']) ? $rule->getValue()['alias'] : die($rule->getName() . '缺少alias');
-                                $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $rule->getValue()['alias'] . '.' . $ruleColumn->targetName;
-                                $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
-                                if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
-                                    $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName);
-                                }
-                            }
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_SQL) !== false) {
-                        //表外字段SQL重写
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_SQL);
-                        if(!empty($ruleColumn)) {
-                            $this->registerRewriteSql($ruleColumn->name, $rule->getValue());
-                        }
-                    } elseif (strpos($rule->getName(), Rule::RA_NOT_REAL_EMPTY) !== false) {
-                        //WHERE从句 如果匹配值真为空则不生效
-                        $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_REAL_EMPTY);
-                        if(!empty($ruleColumn)) {
-                            $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
-                        }
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_SQL) !== false) {
+                    //表外字段SQL重写
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_SQL);
+                    if(!empty($ruleColumn)) {
+                        $this->registerRewriteSql($ruleColumn->name, $rule->getValue());
+                    }
+                } elseif (strpos($rule->getName(), Rule::RA_NOT_REAL_EMPTY) !== false) {
+                    //WHERE从句 如果匹配值真为空则不生效
+                    $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_REAL_EMPTY);
+                    if(!empty($ruleColumn)) {
+                        $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
                     }
                 }
             }
+        }
 
-            if($rule->getPre() !== 'sql_pre') {
-                //将其他实体的结构拼接到主结构中
-                if(!empty($ServiceRuleRepository->sqlArray['select'])) {
-                    $this->sqlArray['select'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['select']);
-                }
-                if(!empty($ServiceRuleRepository->sqlArray['join'])) {
-                    $this->sqlArray['join'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['join']);
-                }
-                if(!empty($ServiceRuleRepository->sqlArray['where'])) {
-                    $this->sqlArray['where'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['where']);
-                }
+        if($rule->getPre() !== 'sql_pre') {
+            //将其他实体的结构拼接到主结构中
+            if(!empty($ServiceRuleRepository->sqlArray['select'])) {
+                $this->sqlArray['select'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['select']);
+            }
+            if(!empty($ServiceRuleRepository->sqlArray['join'])) {
+                $this->sqlArray['join'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['join']);
+            }
+            if(!empty($ServiceRuleRepository->sqlArray['where'])) {
+                $this->sqlArray['where'] .= $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['where']);
+            }
 
-                if(!empty($ServiceRuleRepository->sqlArray['orderBy'])){
-                    if(empty($this->sqlArray['orderBy'])){
-                        $this->sqlArray['orderBy'] = $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['orderBy']);
-                    }else{
-                        $this->sqlArray['orderBy'] .= ',' . $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['orderBy']);
-                    }
+            if(!empty($ServiceRuleRepository->sqlArray['orderBy'])){
+                if(empty($this->sqlArray['orderBy'])){
+                    $this->sqlArray['orderBy'] = $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['orderBy']);
+                }else{
+                    $this->sqlArray['orderBy'] .= ',' . $ServiceRuleRepository->getSql($ServiceRuleRepository->sqlArray['orderBy']);
                 }
             }
         }

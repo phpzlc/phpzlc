@@ -45,7 +45,9 @@ class Error
      */
     public function __construct($msg, $code = '$_ENV[API_ERROR_CODE]def(1)', $name = '', $value = '', $group = '', $other = array())
     {
-        $code = array_key_exists('API_ERROR_CODE', $_ENV) ? $_ENV['API_ERROR_CODE'] : 1;
+        if($code == '$_ENV[API_ERROR_CODE]def(1)'){
+            $code =  array_key_exists('API_ERROR_CODE', $_ENV) ? $_ENV['API_ERROR_CODE'] : 1;
+        }
 
         $this->code = $code;
         $this->msg = $msg;
