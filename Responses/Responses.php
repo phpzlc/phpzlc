@@ -13,6 +13,7 @@ use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Responses
 {
@@ -30,16 +31,25 @@ class Responses
 
     public static function success($message, $data = [], $code = '$_ENV[API_SUCCESS_CODE]def(0)', $type = '$_ENV[API_RESPONSE_TYPE]def(json)')
     {
-        $code = static::getEnvValue('API_SUCCESS_CODE', 0);
-        $type = static::getEnvValue('API_RESPONSE_TYPE', static::RESPONSE_JSON);
+        if($code == '$_ENV[API_SUCCESS_CODE]def(0)'){
+            $code = static::getEnvValue('API_SUCCESS_CODE', 0);
+        }
+        if($type == '$_ENV[API_RESPONSE_TYPE]def(json)'){
+            $type = static::getEnvValue('API_RESPONSE_TYPE', static::RESPONSE_JSON);
+        }
 
         return static::value($code, $message, [], $data, $type);
     }
 
     public static function error($error, $code = '$_ENV[API_ERROR_CODE]def(1)', $data = [], $type = '$_ENV[API_RESPONSE_TYPE]def(json)')
     {
-        $code = static::getEnvValue('API_SUCCESS_CODE', 1);
-        $type = static::getEnvValue('API_RESPONSE_TYPE', static::RESPONSE_JSON);
+        if($code == '$_ENV[API_ERROR_CODE]def(1)'){
+            $code = static::getEnvValue('API_ERROR_CODE', 1);
+        }
+
+        if($type == '$_ENV[API_RESPONSE_TYPE]def(json)'){
+            $type = static::getEnvValue('API_RESPONSE_TYPE', static::RESPONSE_JSON);
+        }
 
         if(is_string($error)){
             $error = new Error($error, $code);
@@ -51,6 +61,10 @@ class Responses
 
     public static function exceptionError(\Exception $exception)
     {
+        if($exception instanceof NotFoundHttpException) {
+            throw new NotFoundHttpException();
+        }
+
         $networkErrorMessage = static::getEnvValue('API_EXCEPTION_ERROR_MSG', '响应异常，服务发生错误');
         $netWorkErrorCode =  static::getEnvValue('API_EXCEPTION_ERROR_CODE', 500);
 
@@ -85,7 +99,7 @@ class Responses
                 return Responses::error($error);
             default:
                 return new Response($networkErrorMessage, $netWorkErrorCode);
-            }
+        }
     }
 
     private static function value($code, $msg, $msgInfo, $data, $type)
