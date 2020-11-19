@@ -1,15 +1,18 @@
 {
     "name": "phpzlc/phpzlc",
-    "description": "",
-    "license": "proprietary",
+    "description": "PhpZlc内核，规定了核心特性，必要组件，写法规范",
+    "homepage": "https://phpzlc.github.io/",
+    "license": "MIT",
     "type": "library",
     "keywords": [
         "phpzlc", "symfony"
     ],
+    "support": {
+        "email": "1044295598@qq.com"
+    },
     "authors": [
         {
-            "name": "jay_he",
-            "email": "hjjhanxing@gmail.com",
+            "name": "CJayHe",
             "role": "Developer"
         }
     ],
@@ -19,10 +22,12 @@
         }
     },
     "require": {
-        "php": "^7.2.5",
-        "phpzlc/validate": "*",
+        "php": ">=7.1.3",
+        "symfony/framework-bundle": "4.4.*",
         "phpmyadmin/sql-parser": "^5.0",
         "ramsey/uuid": "^4.1",
-        "doctrine/doctrine-fixtures-bundle": "^3.3"
+        "phpzlc/validate": "*",
+        "phpzlc/document-bundle": "*",
+        "doctrine/doctrine-fixtures-bundle": "*"
     }
 }
