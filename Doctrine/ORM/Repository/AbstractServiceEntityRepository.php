@@ -82,7 +82,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     final public function findLastAssoc($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
-        $this->sqlArray['orderBy'] = 'ORDER BY '. $this->sqlArray['finalOrderBy'];
+        $this->sqlArray['orderBy'] = 'ORDER BY '. "sql_pre.{$this->getPrimaryKey()} DESC";
         $this->getSql();
 
         $query = $this->_em->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
@@ -144,7 +144,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         return $this->_em->getConnection()->fetchColumn($this->getSql());
     }
-    
+
     /**
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
