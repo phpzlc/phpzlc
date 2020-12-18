@@ -7,18 +7,18 @@
 > php.ini   
 
 ```ini
-upload_max_filesize = 100M
-post_max_size = 100M
+upload_max_filesize = 500M
+post_max_size = 500M
 date.timezone = "Asia/Shanghai"
 ```
 
 > nginx
 
 ```apacheconfig
-client_max_body_size     100M;
-proxy_connect_timeout    900s;
-proxy_read_timeout       900s;
-proxy_send_timeout       900s;
+client_max_body_size     500M;
+proxy_connect_timeout    9000s;
+proxy_read_timeout       9000s;
+proxy_send_timeout       9000s;
 ```
 
 ## 部署
