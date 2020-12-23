@@ -47,12 +47,8 @@ abstract class AbstractBusiness extends AbstractController
         return Errors::validate(self::$validation, $class);
     }
 
-    /**
-     * 网络错误服务
-     *
-     * @param \Exception $exception
-     */
-    final protected function networkError(\Exception $exception)
+
+    protected function networkError(\Exception $exception)
     {
         return Errors::exceptionError($exception);
     }
