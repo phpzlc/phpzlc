@@ -101,11 +101,27 @@ class Errors
      * 异常错误
      *
      * @param \Exception $exception
+     * @return bool
+     * @throws \Exception
      */
     public static function exceptionError(\Exception $exception)
     {
-        if(!static::isExistError()) {
-            throw new \Exception($exception);
+        if(!Errors::isExistError()) {
+            if($_ENV['APP_ENV'] == 'dev'){
+                throw $exception;
+            }
+
+            Errors::setErrorMessage('系统繁忙,请稍后再试');
+
+            //记录错误日志
+            Log::writeLog(
+                ' [EXCEPTION_MESSAGE] ' . $exception->getMessage() .
+                ' [ EXCEPTION_FILE ] ' . $exception->getFile() .
+                ' [ EXCEPTION_CODE ] ' . $exception->getCode() .
+                ' [ EXCEPTION_LINE ] '. $exception->getLine() .
+                ' [ ERROR ] ' . Errors::getError()->msg
+            );
         }
+        return false;
     }
 }
