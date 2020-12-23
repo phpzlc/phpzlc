@@ -2,6 +2,7 @@
 namespace PHPZlc\PHPZlc\Abnormal;
 
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class Errors
 {
@@ -70,6 +71,29 @@ class Errors
     public static function coverError(Error $error)
     {
         array_unshift(static::$errors, $error);
+    }
+
+    /**
+     * symfony ValidatorInterface class
+     *
+     * @param ValidatorInterface $validator
+     * @param $class
+     * @return bool
+     */
+    public static function validate(ValidatorInterface $validator, $class)
+    {
+        if(Errors::isExistError()){
+            return false;
+        }
+
+        $errors = $validator->validate($class);
+
+        if(count($errors) > 0){
+            Errors::setError(new Error($errors->get(0)->getMessage(), 1, $errors->get(0)->getPropertyPath(), $errors->get(0)->getInvalidValue()));
+            return false;
+        }
+
+        return true;
     }
 
 

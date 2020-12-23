@@ -15,6 +15,7 @@ use PHPZlc\PHPZlc\Abnormal\Error;
 use PHPZlc\PHPZlc\Abnormal\Errors;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractBusiness extends AbstractController
 {
@@ -25,6 +26,9 @@ abstract class AbstractBusiness extends AbstractController
      */
     protected $conn;
 
+    /**
+     * @var ValidatorInterface
+     */
     private static $validation;
 
     public function __construct(ContainerInterface $container)
@@ -42,18 +46,7 @@ abstract class AbstractBusiness extends AbstractController
 
     public function validator($class) : bool
     {
-        if(Errors::isExistError()){
-            return false;
-        }
-
-        $errors = self::$validation->validate($class);
-
-        if(count($errors) > 0){
-            Errors::setError(new Error($errors->get(0)->getMessage(), 1, $errors->get(0)->getPropertyPath(), $errors->get(0)->getInvalidValue()));
-            return false;
-        }
-
-        return true;
+        return Errors::validate(self::$validation, $class);
     }
 
     /**
