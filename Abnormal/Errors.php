@@ -74,6 +74,14 @@ class Errors
     }
 
     /**
+     * 清空错误
+     */
+    public static function clearError()
+    {
+        static::$errors = [];
+    }
+
+    /**
      * symfony ValidatorInterface class
      *
      * @param ValidatorInterface $validator

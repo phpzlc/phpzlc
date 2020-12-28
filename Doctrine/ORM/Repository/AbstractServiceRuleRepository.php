@@ -313,6 +313,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     $classRuleMetadata = $this->classRuleMetadataOfPre($SQLSelectColumn->fieldPre, $resultSetMappingBuilder);
                     if (!empty($classRuleMetadata)) {
                         if ($SQLSelectColumn->name == '*') {
+                            //TODO 增加修复
                             $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $classRuleMetadata->getSelectSql([RuleColumn::PT_TYPE_TARGET, RuleColumn::PT_TABLE_IN], $SQLSelectColumn->fieldPre), $this->sqlArray['select']);
                             $isSqlParsers = true;
                         }
