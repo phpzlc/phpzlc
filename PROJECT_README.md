@@ -2,7 +2,7 @@
 
 ## 环境要求
     php 7.3
-    mysql 5.6 以上 可支持8.0版本以上
+    mysql 5.7 以上 可支持8.0版本以上
     
 > php.ini   
 
@@ -28,7 +28,7 @@ proxy_send_timeout       9000s;
 touch .env.local
 vim .env.local
 APP_ENV=prod  #此项目根据开发环境决定，开发者可以不配
-DATABASE_URL=mysql://root:root@127.0.0.1:database/portal_skeleton?serverVersion=5.6  # 数据库配置
+DATABASE_URL=mysql://root:root@127.0.0.1:database/portal_skeleton?serverVersion=5.7  # 数据库配置
 
 //文件夹权限
 mkdir var
