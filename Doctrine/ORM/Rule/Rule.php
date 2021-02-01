@@ -106,12 +106,12 @@ class Rule
     const RA_IN = '_in';
 
     /**
-     * Repository 智能规则 not_info 用于所有字段的查询
+     * Repository 智能规则 not_in 用于所有字段的查询
      */
     const RA_NOT_IN = '_not_in';
 
     /**
-     * Repository 智能规则  用于表外字段的sql重写
+     * Repository 智能规则  用于字段的sql重写
      */
     const RA_SQL = '_sql';
 
