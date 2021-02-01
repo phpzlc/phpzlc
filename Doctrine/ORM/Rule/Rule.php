@@ -187,7 +187,7 @@ class Rule
         }
 
         if($collision == null) {
-            if(in_array($name, self::$defRule)) {
+            if(in_array($name, self::$defRule) && !in_array($name, [self::R_FREED_FALSE_DEL])) {
                 $collision = self::JOINT;
             }else{
                 $collision = self::REPLACE;
