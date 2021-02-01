@@ -96,11 +96,6 @@ class Rule
     const RA_JOIN = '_join';
 
     /**
-     * Repository 智能规则 用于重写字段的SQL表单式
-     */
-    const RA_SELECT = '_select';
-
-    /**
      * Repository 智能规则 is 用于所有字段的条件
      */
     const RA_IS = '_is';
@@ -161,7 +156,7 @@ class Rule
     private $collision;
 
     /**
-     * @var JointInterface
+     * @var InterfaceJoint
      */
     private $jointClass;
 
@@ -299,6 +294,6 @@ class Rule
 
     public static function getAllAIRule() : array
     {
-        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SELECT, self::RA_SQL, self::RA_CONTRAST, self::RA_CONTRAST_2, self::RA_NOT_REAL_EMPTY, self::RA_NOT_IN];
+        return [self::RA_IN, self::RA_JOIN, self::RA_ORDER_BY, self::RA_LIKE, self::RA_IS, self::RA_SQL, self::RA_CONTRAST, self::RA_CONTRAST_2, self::RA_NOT_REAL_EMPTY, self::RA_NOT_IN];
     }
 }
