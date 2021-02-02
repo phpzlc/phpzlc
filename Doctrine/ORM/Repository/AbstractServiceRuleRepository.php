@@ -234,9 +234,9 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         $this->necessaryRules->addRule($rule);
     }
 
-    final protected function registerRewriteSql($suffix_name, $sql)
+    final protected function registerRewriteSql($field_name, $sql)
     {
-        $this->rewriteSqls[$suffix_name] = $sql;
+        $this->rewriteSqls[$field_name] = $sql;
     }
 
     /**
