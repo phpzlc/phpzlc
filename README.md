@@ -22,8 +22,8 @@ PHP 7.3
 
 # 团队名单
 
-1. CJayHe 作者。
+1. [CJayHe](https://github.com/CJayHe) 作者。
 
-2. ExodusHT PHP工程师，核心维护者。
+2. [ExodusHT](https://github.com/ExodusHT) PHP工程师，核心维护者。
 
-3. qiesunl 前端工程师，核心维护者。
+3. [qiesunl](https://github.com/qiesunl) 前端工程师，核心维护者。
