@@ -1,6 +1,7 @@
 # project_name
 
 ## 环境要求
+
     php 7.3
     mysql 5.7 以上 可支持8.0版本以上
     
@@ -40,7 +41,7 @@ sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_B
 touch .env.local
 vim .env.local
 APP_ENV=prod  #此项目根据开发环境决定，开发者可以不配
-DATABASE_URL=mysql://root:root@127.0.0.1:database/portal_skeleton?serverVersion=5.7  # 数据库配置
+DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7  # 数据库配置
 
 //文件夹权限
 mkdir var
