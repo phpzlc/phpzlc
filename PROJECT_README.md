@@ -37,7 +37,7 @@ sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_B
 ## 部署
 
 ```shell script
-//数据库配置
+//项目配置
 touch .env.local
 vim .env.local
 APP_ENV=prod  #此项目根据开发环境决定，开发者可以不配
