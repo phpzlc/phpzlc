@@ -142,7 +142,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 $this->runRules = new Rules($rules);
             }
         }
-        
+
         $this->sql = '';
         $this->sqlArray = $this->telSqlArray;
         $this->runResultSetMappingBuilder->addEntityResult($this->getClassName(), $this->sqlArray['alias']);
@@ -497,7 +497,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         foreach ($rules->getJoinRules() as $rule) {
             $this->ruleProcess($rule, $rules, $resultSetMappingBuilder);
         }
-        
+
         foreach ($rules->getNotJoinRules() as $rule){
             $this->ruleProcess($rule, $rules, $resultSetMappingBuilder);
         }
@@ -530,37 +530,37 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} = '{$rule->getValue()}' ";
                 }
             } elseif (!Validate::isRealEmpty($rule->getValue())) {
-                if (strpos($rule->getName(), Rule::RA_CONTRAST) !== false) {
+                if ($this->matchStringEnd($rule->getName(), Rule::RA_CONTRAST)) {
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST);
                     if (!empty($ruleColumn)) {
                         $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_CONTRAST_2) !== false){
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_CONTRAST_2)){
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST_2);
                     if (!empty($ruleColumn)) {
                         $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_NOT_IN) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_NOT_IN)) {
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_IN);
                     if (!empty($ruleColumn)) {
                         $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} not in ({$rule->getValue()}) ";
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_IN) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_IN)) {
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IN);
                     if (!empty($ruleColumn)) {
                         $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} in ({$rule->getValue()}) ";
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_IS) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_IS)) {
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_IS);
                     if (!empty($ruleColumn)) {
                         $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} is {$rule->getValue()} ";
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_LIKE) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_LIKE)) {
                     if($rule->getValue() != '%%') {
                         //where从句
                         $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_LIKE);
@@ -568,7 +568,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} LIKE '{$rule->getValue()}' ";
                         }
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_ORDER_BY) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_ORDER_BY)) {
                     //orderBy从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_ORDER_BY);
                     if (!empty($ruleColumn)) {
@@ -578,7 +578,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             $ServiceRuleRepository->sqlArray['orderBy'] .= ',' . " {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()}";
                         }
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_JOIN) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_JOIN)) {
                     //JOIN从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
                     if (!empty($ruleColumn)) {
@@ -594,13 +594,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }
                         }
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_SQL) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_SQL)) {
                     //表外字段SQL重写
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_SQL);
                     if(!empty($ruleColumn)) {
                         $this->registerRewriteSql($ruleColumn->name, $rule->getValue());
                     }
-                } elseif (strpos($rule->getName(), Rule::RA_NOT_REAL_EMPTY) !== false) {
+                } elseif ($this->matchStringEnd($rule->getName(), Rule::RA_NOT_REAL_EMPTY)) {
                     //WHERE从句 如果匹配值真为空则不生效
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_NOT_REAL_EMPTY);
                     if(!empty($ruleColumn)) {
@@ -861,5 +861,21 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
 
         return false;
+    }
+
+    /**
+     * 匹配字符串是否在一段文字的最后
+     *
+     * @param string $s1
+     * @param string $s2 匹配值
+     * @return bool
+     */
+    private function matchStringEnd($s1, $s2)
+    {
+        if(strlen($s1) >= strlen($s2)) {
+            return substr($s1, -strlen($s2)) === $s2 ? true : false;
+        }else{
+            return false;
+        }
     }
 }
