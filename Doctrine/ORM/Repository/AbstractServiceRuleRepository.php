@@ -749,6 +749,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
     final public function toArray($entity, $params = ['level' => 0]): array
     {
+        if(empty($entity)) {
+            return [];
+        }
+
         if(array_key_exists('level', $params)){
             $params['level'] --;
         }else{
