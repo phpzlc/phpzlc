@@ -2,6 +2,4 @@
 
 ## 文档
 
-```shell
-composer install phpzlc/phpzlc
-```
+[doc](https://github.com/phpzlc/phpzlc.github.io)
