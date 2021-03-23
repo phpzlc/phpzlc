@@ -54,5 +54,8 @@ php bin/console doctrine:fixtures:load  --append
 
 //安装资源
 php bin/console assets:install  
+
+//生成文档
+php bin/console phpzlc:generate:document
 ```
 
