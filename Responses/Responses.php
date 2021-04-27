@@ -24,7 +24,7 @@ class Responses
 
     const RESPONSE_DEBUG = 'debug';
 
-    private static function getEnvValue($key, $def)
+    public static function getEnvValue($key, $def)
     {
         return array_key_exists($key, $_ENV) ? $_ENV[$key] : $def;
     }

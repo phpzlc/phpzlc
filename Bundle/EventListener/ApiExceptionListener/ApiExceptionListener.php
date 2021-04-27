@@ -30,7 +30,7 @@ class ApiExceptionListener
     public function onKernelException(ExceptionEvent $event)
     {
         // API 主动抛出返回响应
-        if($event->getThrowable() instanceof PhpZlcApiException){
+        if($event->getThrowable() instanceof ApiException){
             $event->setResponse(Responses::error(
                 $event->getThrowable()->getMessage(),
                 $event->getThrowable()->getCode(),
