@@ -28,7 +28,8 @@
         "ramsey/uuid": "^4.1",
         "phpzlc/validate": "*",
         "phpzlc/document-bundle": "*",
-        "doctrine/doctrine-fixtures-bundle": "*"
+        "doctrine/doctrine-fixtures-bundle": "*",
+        "composer/composer": "*"
     },
     "scripts": {
         "post-update-cmd":  "PHPZlc\\PHPZlc\\Composer\\Script::postInstallCmd",
