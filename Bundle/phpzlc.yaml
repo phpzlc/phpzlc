@@ -8,6 +8,6 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
 
-    phpzlc.command.install.:
+    phpzlc.command.install:
         class:  PHPZlc\PHPZlc\Bundle\Command\InstallCommand
         tags: [console.command]
