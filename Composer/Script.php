@@ -42,6 +42,10 @@ class Script
         $vender_path = dirname(dirname(dirname(dirname(__DIR__))));
         $phpzlc = dirname(dirname(__DIR__));
 
+        echo $vender_path;
+        echo $phpzlc;
+        exit;
+
         unlink($vender_path . DIRECTORY_SEPARATOR . $dest);
         copy($phpzlc . DIRECTORY_SEPARATOR . $source, $vender_path . DIRECTORY_SEPARATOR . $dest);
     }
