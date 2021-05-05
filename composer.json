@@ -29,10 +29,5 @@
         "phpzlc/validate": "*",
         "phpzlc/document-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "*",
-        "composer/composer": "*"
-    },
-    "scripts": {
-        "post-update-cmd":  "PHPZlc\\PHPZlc\\Composer\\Script::postInstallCmd",
-        "post-install-cmd": "PHPZlc\\PHPZlc\\Composer\\Script::postInstallCmd"
     }
 }
