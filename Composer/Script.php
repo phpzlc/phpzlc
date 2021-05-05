@@ -15,21 +15,19 @@ class Script
     /**
      * 安装之后执行
      */
-    public function postInstallCmd(Event $composerEvent)
+    public function postInstallCmd(Event $event)
     {
+        $vender_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+
         $configs = [
-            "Doctrine/ORM/Rewrite/Templates/Repository.tpl.php" => "vendor/symfony/maker-bundle/src/Resources/skeleton/doctrine/Repository.tpl.php",
-            "Doctrine/ORM/Rewrite/Hydration/ObjectHydrator.php"=> "vendor/doctrine/orm/lib/Doctrine/ORM/Internal/Hydration/ObjectHydrator.php",
-            "Doctrine/ORM/Rewrite/MakeEntityRegenerate/ClassSourceManipulator.php" => "vendor/symfony/maker-bundle/src/Util/ClassSourceManipulator.php",
-            "Doctrine/ORM/Rewrite/MakeEntityRegenerate/EntityRegenerator.php" => "vendor/symfony/maker-bundle/src/Doctrine/EntityRegenerator.php"
+            "phpzlc/phpzlc/Doctrine/ORM/Rewrite/Templates/Repository.tpl.php" => "symfony/maker-bundle/src/Resources/skeleton/doctrine/Repository.tpl.php",
+            "phpzlc/phpzlc/Doctrine/ORM/Rewrite/Hydration/ObjectHydrator.php"=> "doctrine/orm/lib/Doctrine/ORM/Internal/Hydration/ObjectHydrator.php",
+            "phpzlc/phpzlc/Doctrine/ORM/Rewrite/MakeEntityRegenerate/ClassSourceManipulator.php" => "symfony/maker-bundle/src/Util/ClassSourceManipulator.php",
+            "phpzlc/phpzlc/Doctrine/ORM/Rewrite/MakeEntityRegenerate/EntityRegenerator.php" => "symfony/maker-bundle/src/Doctrine/EntityRegenerator.php"
         ];
 
-        $composerEvent->io->writeError('ccc');
-
-
-
         foreach ($configs as $key => $value){
-            $this->tihuan($key, $value);
+            $this->tihuan($vender_dir . $key , $vender_dir . $value);
         }
 
         echo 0;
