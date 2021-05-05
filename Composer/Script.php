@@ -15,7 +15,7 @@ class Script
     /**
      * 安装之后执行
      */
-    public function postInstallCmd()
+    public function postInstallCmd(Event $composerEvent)
     {
         $configs = [
             "Doctrine/ORM/Rewrite/Templates/Repository.tpl.php" => "vendor/symfony/maker-bundle/src/Resources/skeleton/doctrine/Repository.tpl.php",
@@ -23,6 +23,10 @@ class Script
             "Doctrine/ORM/Rewrite/MakeEntityRegenerate/ClassSourceManipulator.php" => "vendor/symfony/maker-bundle/src/Util/ClassSourceManipulator.php",
             "Doctrine/ORM/Rewrite/MakeEntityRegenerate/EntityRegenerator.php" => "vendor/symfony/maker-bundle/src/Doctrine/EntityRegenerator.php"
         ];
+
+        $composerEvent->io->writeError('ccc');
+
+
 
         foreach ($configs as $key => $value){
             $this->tihuan($key, $value);
