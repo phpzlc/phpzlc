@@ -40,11 +40,11 @@ sudo chmod -R 777 var/
 php bin/console doctrine:database:create
 php bin/console doctrine:schema:create
 
-//内置数据
-php bin/console doctrine:fixtures:load  --append
-
 //安装资源
 php bin/console assets:install  
+
+//内置数据(APP_ENV=dev环境下可执行)
+php bin/console doctrine:fixtures:load  --append
 
 //生成文档(非必须)
 php bin/console phpzlc:generate:document
