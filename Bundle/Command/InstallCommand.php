@@ -34,17 +34,18 @@ class InstallCommand extends Base
     {
         $filesystem = new Filesystem();
 
-        foreach ($this->configs as $originFile => $targetFile){
-            $filesystem->copy(
-                $this->getRootPath() . DIRECTORY_SEPARATOR . 'vender' . DIRECTORY_SEPARATOR. $originFile,
-                $this->getRootPath() . DIRECTORY_SEPARATOR . 'vender' . DIRECTORY_SEPARATOR. $targetFile
-            );
+        foreach ($this->configs as $originFile => $targetFile)
+        {
+            $originFile = $this->getRootPath() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR. $originFile;
+            $targetFile = $this->getRootPath() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR. $targetFile;
+            
+            $filesystem->copy($originFile, $targetFile);
+
+            $this->io->success('内核拷贝'. $originFile . '=>' . $targetFile );
 
         }
-        $filesystem->copy();
-        
 
-        $this->io->success('生成成功');
+        $this->io->success('安装成功');
 
         return 0;
     }

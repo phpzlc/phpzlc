@@ -26,7 +26,7 @@ abstract class Base extends Command
 
     protected function getRootPath()
     {
-        return  dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))));
+        return  dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
     }
 
     protected function interact(InputInterface $input, OutputInterface $output)
