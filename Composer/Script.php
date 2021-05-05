@@ -15,7 +15,7 @@ class Script
     /**
      * 安装之后执行
      */
-    public function postPackageInstall()
+    public function postInstallCmd()
     {
         $configs = [
             "Doctrine/ORM/Rewrite/Templates/Repository.tpl.php" => "vendor/symfony/maker-bundle/src/Resources/skeleton/doctrine/Repository.tpl.php",
