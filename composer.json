@@ -31,7 +31,7 @@
         "doctrine/doctrine-fixtures-bundle": "*"
     },
     "scripts": {
-        "postInstallCmd": [
+        "post-install-cmd": [
             "PHPZlc\\PHPZlc\\Composer\\Script::postInstallCmd"
         ]
     }
