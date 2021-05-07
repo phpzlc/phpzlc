@@ -17,12 +17,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 abstract class AbstractBusiness extends AbstractController
 {
-    protected $em;
+    public $em;
 
     /**
      * @var Connection
      */
-    protected $conn;
+    public $conn;
 
     /**
      * @var ValidatorInterface
