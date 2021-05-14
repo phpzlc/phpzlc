@@ -15,7 +15,6 @@ class SortIdGenerator extends AbstractIdGenerator
 
         $uuid = substr($uuid[0], -4) . '1' . $uuid[3] . substr($uuid[4], -4);
 
-        return str_replace('.','',microtime(true)) . '-' . $uuid  . '-' . rand(1,  100);
+        return str_replace('.', '', microtime(true)) . '-' . $uuid  . '-' . rand(1,  100);
     }
-
 }
