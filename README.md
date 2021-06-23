@@ -2,4 +2,4 @@
 
 ## 文档
 
-[https://phpzlc.github.io/](https://phpzlc.github.io/)
+[https://phpzlc.com](https://phpzlc.com)
