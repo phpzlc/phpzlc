@@ -38,7 +38,8 @@ class InstallCommand extends Base
         {
             $originFile = $this->getRootPath() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR. $originFile;
             $targetFile = $this->getRootPath() . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR. $targetFile;
-            
+
+            $filesystem->remove($targetFile);
             $filesystem->copy($originFile, $targetFile);
 
             $this->io->success('内核拷贝'. $originFile . '=>' . $targetFile );
