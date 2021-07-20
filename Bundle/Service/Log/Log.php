@@ -10,7 +10,7 @@ use PHPZlc\PHPZlc\Bundle\Service\FileSystem\FileSystem;
 
 class Log
 {
-    private static function getLogFilePath($logFileName)
+    public static function getLogFilePath($logFileName)
     {
         if(empty($logFileName)){
             $logFileName =  $_ENV['APP_ENV'] . '.log';
