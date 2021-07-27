@@ -1,6 +1,6 @@
 <?php
 /**
- * 分表操作类
+ * 拆表管理与操作
  *
  * User: Jay
  * Date: 2019/8/27
@@ -19,7 +19,7 @@ use PHPZlc\Validate\Validate;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;
 
-abstract class AbstractSubTableRepository extends AbstractServiceRuleRepository
+abstract class AbstractDismantleTableRepository extends AbstractServiceRuleRepository
 {
     /**
      * @var string 源(参照)表名称
@@ -27,10 +27,10 @@ abstract class AbstractSubTableRepository extends AbstractServiceRuleRepository
     public $referTableName;
 
     /**
-     * @var string 源(参照)表名称
+     * @var string 拆表标记
      *
      */
-    public $subMark;
+    public $dismantleMark;
 
     public function __construct(ManagerRegistry $registry, string $entityClass)
     {
@@ -39,55 +39,55 @@ abstract class AbstractSubTableRepository extends AbstractServiceRuleRepository
     }
 
     /**
-     * 设置分表标记
+     * 设置拆表标识
      *
-     * @param $subMake
+     * @param $dismantleMark
      * @return $this
      */
-    public function subMake($subMake)
+    public function dismantleMark($dismantleMark)
     {
-        $this->subMark = $subMake;
-        parent::setTableName($this->getSubTableName($this->getTableName(), $subMake));
+        $this->$dismantleMark = $dismantleMark;
+        parent::setTableName($this->getDismantleTableName($this->getTableName(), $dismantleMark));
 
         return $this;
     }
 
     /**
-     * 得到分表的名字
+     * 得到拆分表的名称
      *
      * @param $tableName
-     * @param $subMark
+     * @param $dismantleMark
      * @return string
      */
-    private function getSubTableName($tableName, $subMark)
+    private function getDismantleTableName($tableName, $dismantleMark)
     {
-        return $tableName . '_sub_' . md5($subMark);
+        return $tableName . '_dis_' . md5($dismantleMark);
     }
 
     /**
-     * 得到全部的分表
+     * 得到全部的拆分表
      *
      * @return array
      */
-     function getAllSubTable()
-     {
-         $all = $this->_em->getConnection()->fetchAll("SHOW TABLES LIKE '{$this->referTableName}_sub_%'");
+    function getAllDismantleTable()
+    {
+        $all = $this->_em->getConnection()->fetchAll("SHOW TABLES LIKE '{$this->referTableName}_dis_%'");
 
-         $tables = [];
+        $tables = [];
 
-         foreach ($all as $item) {
-             foreach ($item as $table){
-                 $tables[] = $table;
-             }
-         }
+        foreach ($all as $item) {
+            foreach ($item as $table){
+                $tables[] = $table;
+            }
+        }
 
-         return $tables;
-     }
+        return $tables;
+    }
 
     /**
-     * 创建分表
+     * 创建拆分表
      */
-    public function createSubTable()
+    public function createDismantleTable()
     {
         $schemaManager = $this->_em->getConnection()->getSchemaManager();
 
@@ -95,20 +95,19 @@ abstract class AbstractSubTableRepository extends AbstractServiceRuleRepository
             $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($this->_em);
             $schemaTool->createSchema(array($this->getClassMetadata()));
         }
-        
+
         return $this;
     }
 
     /**
-     * 更新全部分表结构
+     * 更新全部拆分表的结构
      */
-    public function updateAllSubTable()
+    public function updateAllDismantleTable()
     {
-        $subTables = $this->getAllSubTable();
-
-
-        foreach ($subTables as $subTable) {
-            $this->setTableName($subTable);
+        $dismantleTables = $this->getAllDismantleTable();
+        
+        foreach ($dismantleTables as $dismantleTable) {
+            $this->setTableName($dismantleTable);
             $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($this->_em);
             $schemaTool->updateSchema(array($this->getClassMetadata()), true);
         }
