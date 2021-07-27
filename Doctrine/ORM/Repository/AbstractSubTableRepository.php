@@ -19,7 +19,7 @@ use PHPZlc\Validate\Validate;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use PhpMyAdmin\SqlParser\Parser;
 
-abstract class AbstractDismantleTableRepository extends AbstractServiceRuleRepository
+abstract class AbstractDismantleTableRepository extends AbstractServiceEntityRepository
 {
     /**
      * @var string 源(参照)表名称
