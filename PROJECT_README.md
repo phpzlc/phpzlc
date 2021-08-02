@@ -30,7 +30,6 @@ sql_mode ='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_B
 touch .env.local
 vim .env.local
 APP_ENV=prod  #生产环境配置
-ADMIN_ENV=dev #页面显示环境设置 beta 内测 dev开发模式 prod 正式环境
 DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.7  # 数据库配置
 
 //文件夹权限
