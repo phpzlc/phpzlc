@@ -1,7 +1,7 @@
 {
     "name": "phpzlc/phpzlc",
     "description": "PhpZlc内核，规定了核心特性，必要组件，写法规范",
-    "homepage": "https://phpzlc.github.io/",
+    "homepage": "https://phpzlc.com/",
     "license": "MIT",
     "type": "library",
     "keywords": [
