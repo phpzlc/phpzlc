@@ -46,7 +46,7 @@ abstract class AbstractDismantleTableRepository extends AbstractServiceEntityRep
      */
     public function dismantleMark($dismantleMark)
     {
-        $this->$dismantleMark = $dismantleMark;
+        $this->dismantleMark = $dismantleMark;
         parent::setTableName($this->getDismantleTableName($this->getTableName(), $dismantleMark));
 
         return $this;
