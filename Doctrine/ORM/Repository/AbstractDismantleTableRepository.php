@@ -48,6 +48,7 @@ abstract class AbstractDismantleTableRepository extends AbstractServiceEntityRep
     {
         $this->dismantleMark = $dismantleMark;
         parent::setTableName($this->getDismantleTableName($this->getTableName(), $dismantleMark));
+        $this->createDismantleTable();
 
         return $this;
     }
@@ -61,7 +62,15 @@ abstract class AbstractDismantleTableRepository extends AbstractServiceEntityRep
      */
     private function getDismantleTableName($tableName, $dismantleMark)
     {
-        return $tableName . '_dis_' . md5($dismantleMark);
+        if(empty($dismantleMark)){
+            die('拆表标识不能为空');
+        }
+
+        if(strpos($tableName, '_dis_') == false){
+            return $tableName . '_dis_' . md5($dismantleMark);
+        }else{
+            return $tableName;
+        }
     }
 
     /**
