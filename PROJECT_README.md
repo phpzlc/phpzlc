@@ -34,7 +34,7 @@ DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/db_name?serverVersion=5.
 
 //文件夹权限
 mkdir var
-sudo chmod -R 777 var/
+sudo chmod -R 755 var/
 
 //创建数据库
 php bin/console doctrine:database:create
