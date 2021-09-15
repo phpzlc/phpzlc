@@ -43,9 +43,9 @@ class Log
             throw new NotFoundHttpException();
         }
 
-        $FileSystem = new FileSystem();
+        $fileSystem = new FileSystem();
 
-        $return = $FileSystem->readFile($path, $rows);
+        $return = $fileSystem->readFile($path, $rows);
         for ($i = count($return) - 1; $i > -1; $i --){
             echo $return[$i];
             echo '<br>';

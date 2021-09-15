@@ -1,7 +1,4 @@
 services:
-    phpzlc.file_system:
-        class: PHPZlc\PHPZlc\Bundle\Service\FileSystem\FileSystem
-
     phpzlc.saftey.action_load:
         class: PHPZlc\PHPZlc\Bundle\Safety\ActionLoad
         arguments: [ '@service_container' ]
