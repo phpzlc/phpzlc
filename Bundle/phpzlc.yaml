@@ -2,6 +2,12 @@ services:
     phpzlc.file_system:
         class: PHPZlc\PHPZlc\Bundle\Service\FileSystem\FileSystem
 
+    phpzlc.saftey.action_load:
+        class: PHPZlc\PHPZlc\Bundle\Safety\ActionLoad
+        arguments: [ '@service_container' ]
+        tags:
+            - { name: kernel.event_subscriber, event: kernel.controller, method: onKernelController }
+
     phpzlc.listener.api_exception:
         class: PHPZlc\PHPZlc\Bundle\EventListener\ApiExceptionListener\ApiExceptionListener
         arguments: ['@service_container']
