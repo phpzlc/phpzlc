@@ -196,7 +196,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
     final public function find($id, $lockMode = null, $lockVersion = null)
     {
-        if(is_array($id)){
+        if(is_array($id) || is_object($id)){
             return $this->findAssoc($id);
         }else{
             return $this->findAssocById($id);
