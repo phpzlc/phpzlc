@@ -28,7 +28,6 @@ abstract class AbstractDismantleTableRepository extends AbstractServiceEntityRep
 
     /**
      * @var string 拆表标记
-     *
      */
     public $dismantleMark;
 
