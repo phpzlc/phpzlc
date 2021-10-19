@@ -67,4 +67,17 @@ class Error
 
         return $masInfo;
     }
+
+    public function toArray()
+    {
+        return [
+            'code' => $this->code,
+            'msg' => $this->msg,
+            'name' => $this->name,
+            'value' => $this->value,
+            'group' => $this->group,
+            'other' => $this->other,
+            'msgInfo' => $this->getMsgInfo()
+        ];
+    }
 }

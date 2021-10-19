@@ -64,6 +64,26 @@ class Errors
     }
 
     /**
+     * 得到全部错误数组
+     *
+     * @return array
+     */
+    public static function getAllErrorArray()
+    {
+        $errors = array();
+
+        foreach (static::$errors as $error){
+            if(empty($error->name)) {
+                $errors[] = $error->toArray();
+            }else{
+                $errors[$error->name] = $error->toArray();
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
      * 覆盖错误
      *
      * @param Error $error
