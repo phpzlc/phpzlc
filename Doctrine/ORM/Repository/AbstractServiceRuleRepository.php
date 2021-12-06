@@ -581,10 +581,17 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_JOIN);
                     if (!empty($ruleColumn)) {
                         if($ruleColumn->isEntity){
+                            if(is_array($rule->getValue())){
+                                $alias = isset($rule->getValue()['alias']) ? $rule->getValue()['alias'] : null;
+                            }else{
+                                $alias = $rule->getValue();
+                            }
+                            if(empty($alias)){
+                                die($rule->getName() . '缺少alias');
+                            }
                             $joinclassRuleMetadata = $this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity);
                             $type = isset($rule->getValue()['type']) ? $rule->getValue()['type']: ' LEFT JOIN ';
                             $tableName = isset($rule->getValue()['tableName']) ? $rule->getValue()['tableName'] : $joinclassRuleMetadata->getTableName();
-                            $alias = isset($rule->getValue()['alias']) ? $rule->getValue()['alias'] : die($rule->getName() . '缺少alias');
                             $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $rule->getValue()['alias'] . '.' . $ruleColumn->targetName;
                             $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
                             if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
