@@ -29,7 +29,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['select'] = '1';
 
-        return $this->_em->getConnection()->fetchColumn($this->getSql()) == '1' ? true : false;
+        return $this->_em->getConnection()->fetchOne($this->getSql()) == '1' ? true : false;
     }
 
 
@@ -171,7 +171,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['select'] = 'count(sql_pre.' . $this->getPrimaryKey() .')';
 
-        return $this->_em->getConnection()->fetchColumn($this->getSql());
+        return $this->_em->getConnection()->fetchOne($this->getSql());
     }
 
     /**
