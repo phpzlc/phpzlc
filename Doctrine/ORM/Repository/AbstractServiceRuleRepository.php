@@ -592,7 +592,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             $joinclassRuleMetadata = $this->getEntityManager()->getClassMetadata($ruleColumn->targetEntity);
                             $type = isset($rule->getValue()['type']) ? $rule->getValue()['type']: ' LEFT JOIN ';
                             $tableName = isset($rule->getValue()['tableName']) ? $rule->getValue()['tableName'] : $joinclassRuleMetadata->getTableName();
-                            $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $rule->getValue()['alias'] . '.' . $ruleColumn->targetName;
+                            $on = isset($rule->getValue()['on']) ? $rule->getValue()['on'] : $ruleColumn->getSqlComment($rule->getPre()) . ' = ' . $alias . '.' . $ruleColumn->targetName;
                             $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
                             if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
                                 $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName);
