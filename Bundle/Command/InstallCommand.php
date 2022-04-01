@@ -17,6 +17,7 @@ class InstallCommand extends Base
 {
     private $configs = [
         "phpzlc/phpzlc/Doctrine/ORM/Rewrite/Templates/Repository.tpl.php" => "symfony/maker-bundle/src/Resources/skeleton/doctrine/Repository.tpl.php",
+        "phpzlc/phpzlc/Doctrine/ORM/Rewrite/Hydration/AbstractHydrator.php"=> "doctrine/orm/lib/Doctrine/ORM/Internal/Hydration/AbstractHydrator.php",
         "phpzlc/phpzlc/Doctrine/ORM/Rewrite/Hydration/ObjectHydrator.php"=> "doctrine/orm/lib/Doctrine/ORM/Internal/Hydration/ObjectHydrator.php",
         "phpzlc/phpzlc/Doctrine/ORM/Rewrite/MakeEntityRegenerate/ClassSourceManipulator.php" => "symfony/maker-bundle/src/Util/ClassSourceManipulator.php",
         "phpzlc/phpzlc/Doctrine/ORM/Rewrite/MakeEntityRegenerate/EntityRegenerator.php" => "symfony/maker-bundle/src/Doctrine/EntityRegenerator.php"

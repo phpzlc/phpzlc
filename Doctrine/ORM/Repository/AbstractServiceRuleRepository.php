@@ -407,7 +407,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }else{
                                 $resultSetMappingBuilder->addFieldResult($SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre, $ruleColumn->name, $ruleColumn->propertyName);
                                 if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT){
-                                    $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $SQLSelectColumn->cloumn .' as ' . $SQLSelectColumn->name, $this->sqlArray['select']);
+                                    $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $SQLSelectColumn->cloumn .' as ' . $ruleColumn->name, $this->sqlArray['select']);
                                 }
                             }
                         }else{
