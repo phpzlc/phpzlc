@@ -1,7 +1,7 @@
-# PHPZLC
+## PHPZlc & Symfony Doc
 
-PHPZlc内核，规定了核心特性，必要组件，写法规范
+为开发者提供全套Symfony实践教程和解决方案。
 
-## 文档
+## 官网
 
 [https://phpzlc.com](https://phpzlc.com)
