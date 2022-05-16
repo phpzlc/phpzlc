@@ -259,20 +259,18 @@ class ObjectHydrator extends AbstractHydrator
         //重写 将表外字段加入
         $entity = $this->_uow->createEntity($className, $data, $this->_hints);
         $classRuleMetaData = ClassRuleMetaDataFactroy::getClassRuleMetadata($this->_metadataCache[$className]);
-        $reflectionClass = new \ReflectionClass($entity);
-
         foreach ($data as $key => $value){
             $ruleColumn = $classRuleMetaData->getRuleColumnOfPropertyName($key);
             if(!empty($ruleColumn)){
                 if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT){
-                    $property = $reflectionClass->getProperty($ruleColumn->propertyName);
+                    $property = $classRuleMetaData->getClassMetadata()->reflClass->getProperty($ruleColumn->propertyName);
                     $property->setAccessible(true);
                     $property->setValue($entity, $value);
                 }
             }
         }
 
-        return $this->_uow->createEntity($className, $data, $this->_hints);
+        return $entity;
     }
 
     /**
