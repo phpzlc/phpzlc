@@ -92,4 +92,16 @@ class SQL
 
         return $sql;
     }
+    
+    /**
+     * sql_pre 替换
+     *
+     * @param $sql
+     * @param $pre
+     * @return string
+     */
+    public static function sqlPreReplace($sql , $pre)
+    {
+        return str_replace('sql_pre.', $pre . '.', $sql);
+    }
 }
