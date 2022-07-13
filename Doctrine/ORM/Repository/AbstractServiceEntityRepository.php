@@ -199,7 +199,11 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         if(is_array($id) || is_object($id)){
             return $this->findAssoc($id);
         }else{
-            return $this->findAssocById($id);
+            if(is_array($lockMode) || is_object($lockMode)){
+                return $this->findAssocById($id, $lockMode);
+            }else{
+                return $this->findAssocById($id);
+            }
         }
     }
 }
