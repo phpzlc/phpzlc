@@ -49,6 +49,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'join' => '',
         'select' => '',
         'where' => '',
+        'groupBy' => '',
         'orderBy' => '',
         'finalOrderBy' => '',
         'primaryKey' => '',
@@ -62,6 +63,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'join' => '',
         'select' => '',
         'where' => '',
+        'groupBy' => '',
         'orderBy' => '',
         'finalOrderBy' => '',
         'primaryKey' => '',
@@ -162,6 +164,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
         if($this->runRules->issetRule(Rule::R_ORDER_BY)){
             $this->sqlArray['orderBy'] =  $this->runRules->getRule(Rule::R_ORDER_BY)->getValue();
+        }
+
+        if($this->runRules->issetRule(Rule::R_GROUY_BY)){
+            $this->sqlArray['groupBy'] =  $this->runRules->getRule(Rule::R_GROUY_BY)->getValue();
         }
 
         if(!empty($this->sqlArray['falseDeleteField'])){
@@ -540,7 +546,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                     //where从句
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($rule->getSuffixName(), Rule::RA_CONTRAST_2);
                     if (!empty($ruleColumn)) {
-                        if(!Validate::isRealEmpty($rule->getValue()[1])) {
+                        if(!Validate::isRealEmpty($rule->getValue()[1])){
                             $ServiceRuleRepository->sqlArray['where'] .= " AND {$ruleColumn->getSqlComment($rule->getPre())} {$rule->getValue()[0]} '{$rule->getValue()[1]}' ";
                         }
                     }
@@ -690,7 +696,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
     private function generateSql()
     {
-        return "SELECT {$this->sqlArray['select']} FROM {$this->sqlArray['from']} {$this->sqlArray['alias']} {$this->sqlArray['join']} WHERE 1 {$this->sqlArray['where']} {$this->sqlArray['orderBy']}";
+        return "SELECT {$this->sqlArray['select']} FROM {$this->sqlArray['from']} {$this->sqlArray['alias']} {$this->sqlArray['join']} WHERE 1 {$this->sqlArray['where']} {$this->sqlArray['groupBy']} {$this->sqlArray['orderBy']}";
     }
 
     private function getAliasIncrease()

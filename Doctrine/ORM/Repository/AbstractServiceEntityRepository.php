@@ -73,7 +73,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
     /**
      * 检索一条数据
-     * 
+     *
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param string $aliasChain
@@ -98,7 +98,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
     /**
      * 检索得到最新的一条数据
-     * 
+     *
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param string $aliasChain
@@ -124,8 +124,8 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     }
 
     /**
-     * 根据id检索一条数据 
-     * 
+     * 根据id检索一条数据
+     *
      * @param $id
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
@@ -160,7 +160,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
     /**
      * 得到数据总数
-     * 
+     *
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param string $aliasChain
@@ -170,13 +170,14 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['select'] = 'count(sql_pre.' . $this->getPrimaryKey() .')';
+        $this->sqlArray['orderBy'] = '';
 
         return $this->_em->getConnection()->fetchOne($this->getSql());
     }
 
     /**
      * 得到检索sql
-     * 
+     *
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param string $aliasChain
@@ -188,7 +189,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         return $this->getSql();
     }
-    
+
     final public function findOneBy(array $criteria, array $orderBy = null)
     {
         return $this->findAssoc($criteria);
