@@ -173,7 +173,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->sqlArray['orderBy'] = '';
         if(!empty($this->sqlArray['groupBy'])){
             $this->sqlArray['groupBy'] = str_replace(' GROUP BY ', '', $this->sqlArray['groupBy']);
-            $this->sqlArray['select'] = 'count('. $this->sqlArray['groupBy'] .')';
+            $this->sqlArray['select'] = 'count(distinct '. $this->sqlArray['groupBy'] .')';
             $this->sqlArray['orderBy'] = '';
             $this->sqlArray['groupBy'] = '';
         }
