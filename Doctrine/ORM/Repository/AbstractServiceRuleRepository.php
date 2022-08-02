@@ -491,8 +491,12 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             }
         }
 
-        if(!empty($this->sqlArray)){
+        if(!empty($this->sqlArray['orderBy'])){
             $this->sqlArray['orderBy'] = ' ORDER BY ' . $this->sqlArray['orderBy'];
+        }
+
+        if(!empty($this->sqlArray['groupBy'])){
+            $this->sqlArray['groupBy'] = ' GROUP BY ' . $this->sqlArray['groupBy'];
         }
     }
 

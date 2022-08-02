@@ -171,6 +171,12 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['select'] = 'count(sql_pre.' . $this->getPrimaryKey() .')';
         $this->sqlArray['orderBy'] = '';
+        if(!empty($this->sqlArray['groupBy'])){
+            $this->sqlArray['groupBy'] = str_replace(' GROUP BY ', '', $this->sqlArray['groupBy']);
+            $this->sqlArray['select'] = 'count('. $this->sqlArray['groupBy'] .')';
+            $this->sqlArray['orderBy'] = '';
+            $this->sqlArray['groupBy'] = '';
+        }
 
         return $this->_em->getConnection()->fetchOne($this->getSql());
     }
