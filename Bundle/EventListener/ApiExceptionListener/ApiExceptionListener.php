@@ -6,10 +6,7 @@
  */
 namespace PHPZlc\PHPZlc\Bundle\EventListener\ApiExceptionListener;
 
-use PHPZlc\PHPZlc\Abnormal\Error;
 use PHPZlc\PHPZlc\Abnormal\Errors;
-use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
-use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Responses\Responses;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
