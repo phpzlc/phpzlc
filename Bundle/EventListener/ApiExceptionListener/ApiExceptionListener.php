@@ -12,6 +12,8 @@ use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Responses\Responses;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -22,9 +24,15 @@ class ApiExceptionListener
      */
     private $container;
 
+    /**
+     * @var RequestStack
+     */
+    private $request;
+
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->request = $this->container->get('request_stack');
     }
 
     public function onKernelException(ExceptionEvent $event)
@@ -41,7 +49,9 @@ class ApiExceptionListener
 
         // 生产模式 隐藏500错误
         if($_ENV['APP_ENV'] == 'prod'){
-            $event->setResponse(Responses::exceptionError($event->getThrowable()));
+            $event->setResponse(Errors::exceptionError($event->getThrowable(), false, $this->request));
+        }else{
+            throw $event->getThrowable();
         }
     }
 }
