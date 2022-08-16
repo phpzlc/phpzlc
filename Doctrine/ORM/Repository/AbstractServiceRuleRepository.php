@@ -166,8 +166,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             $this->sqlArray['orderBy'] =  $this->runRules->getRule(Rule::R_ORDER_BY)->getValue();
         }
 
-        if($this->runRules->issetRule(Rule::R_GROUY_BY)){
-            $this->sqlArray['groupBy'] =  $this->runRules->getRule(Rule::R_GROUY_BY)->getValue();
+        if($this->runRules->issetRule(Rule::R_GROUP_BY)){
+            $this->sqlArray['groupBy'] =  $this->runRules->getRule(Rule::R_GROUP_BY)->getValue();
         }
 
         if(!empty($this->sqlArray['falseDeleteField'])){

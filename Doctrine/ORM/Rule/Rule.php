@@ -12,7 +12,7 @@ class Rule
      * @var array
      */
     public static $defRule = [
-        self::R_SELECT, self::R_JOIN, self::R_WHERE, self::R_GROUY_BY, self::R_ORDER_BY, self::R_HIDE_SELECT, self::R_FREED_FALSE_DEL
+        self::R_SELECT, self::R_JOIN, self::R_WHERE, self::R_GROUP_BY, self::R_ORDER_BY, self::R_HIDE_SELECT, self::R_FREED_FALSE_DEL
     ];
 
     /**
@@ -61,9 +61,9 @@ class Rule
     const R_ORDER_BY = 'order_by';  //默认支持规则order_by  自定义优先排序方式 （支持一维数组和字符串） 单个数组中为字符串  条件会自动拼接到sql中 参数开头必须是 ASC DESC
 
     /**
-     * Repository 默认规则-grouy_by  最高优先级排序
+     * Repository 默认规则-group_by  最高优先级排序groupBy
      */
-    const R_GROUY_BY = 'grouy_by';  //默认支持规则grouy_by
+    const R_GROUP_BY = 'group_by';  //默认支持规则group_by 分组查询
 
     /**
      * Repository 默认规则-where
