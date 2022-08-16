@@ -1,7 +1,6 @@
 <?php
 namespace PHPZlc\PHPZlc\Abnormal;
 
-use Matrix\Exception;
 use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use PHPZlc\PHPZlc\Responses\Responses;
