@@ -132,7 +132,7 @@ class Errors
         return true;
     }
 
-    public static function exceptionError(\Exception $exception, bool $isThrow = true, RequestStack $request = null)
+    public static function exceptionError(\Throwable $exception, bool $isThrow = true, RequestStack $request = null)
     {
         if($isThrow){
             throw $exception;
