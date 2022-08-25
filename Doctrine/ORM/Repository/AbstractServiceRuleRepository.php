@@ -92,6 +92,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     public $necessaryRules = null;
 
     /**
+     * join时也生效的规则名
+     *
+     * @var array
+     */
+    public $necessaryRulesJoineffectives = [];
+
+    /**
      * @var array
      */
     public $registerRules = [];
@@ -100,6 +107,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      * @var array
      */
     public $rewriteSqls = [];
+
+    /**
+     * join主键对应的表别名
+     *
+     * @var array
+     */
+    private $columnOwnerMap = [];
 
 ##############################  表属性 start ##################################
 
@@ -229,13 +243,17 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      *
      * @param Rule $rule
      */
-    final protected function registerNecessaryRule(Rule $rule)
+    final protected function registerNecessaryRule(Rule $rule, $joinEffective = false)
     {
         if(empty($this->necessaryRules)){
             $this->necessaryRules = new Rules();
         }
 
         $this->necessaryRules->addRule($rule);
+
+        if($joinEffective){
+            $this->necessaryRulesJoineffectives[$rule->getName()] = 1;
+        }
     }
 
     final protected function registerRewriteSql($field_name, $sql)
@@ -283,10 +301,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
             $serviceRuleRepository = $this->getServiceRuleRepository($pre, $entity);
             if(!empty($serviceRuleRepository->necessaryRules)) {
                 foreach ($serviceRuleRepository->necessaryRules->getRules() as $rule) {
-                    if($serviceRuleRepository->sqlArray['alias'] != $this->sqlArray['alias']) {
-                        $rule->editPre($serviceRuleRepository->sqlArray['alias']);
+                    if($pre == $this->sqlArray['alias'] || array_key_exists($rule->getName(), $serviceRuleRepository->necessaryRulesJoineffectives)){
+                        $nRule = clone $rule;
+                        if($serviceRuleRepository->sqlArray['alias'] != $this->sqlArray['alias']) {
+                            $nRule->editPre($serviceRuleRepository->sqlArray['alias']);
+                        }
+                        $rules->addRule($nRule);
                     }
-                    $rules->addRule($rule);
                 }
             }
         }
@@ -413,7 +434,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }else{
                                 $resultSetMappingBuilder->addFieldResult($SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre, $ruleColumn->name, $ruleColumn->propertyName);
                                 if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT){
-                                    $this->sqlArray['select'] = str_replace($SQLSelectColumn->cloumn, $SQLSelectColumn->cloumn .' as ' . $ruleColumn->name, $this->sqlArray['select']);
+                                    $this->sqlArray['select'] = $this->rewriteSqlReplace($SQLSelectColumn->cloumn, $SQLSelectColumn->cloumn .' as ' . $ruleColumn->name, $this->sqlArray['select']);
                                 }
                             }
                         }else{
@@ -426,8 +447,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                             $tar_pre = $this->getAliasIncrease();
                                             $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $tar_pre, $SQLSelectColumn->fieldPre == 'sql_pre' ? $this->sqlArray['alias'] : $SQLSelectColumn->fieldPre, $ruleColumn->propertyName);
                                         }
-                                    }
-                                    if (!empty($tar_pre)) {
+                                    } else {
+                                        if(array_key_exists($SQLSelectColumn->name, $this->columnOwnerMap)){
+                                            $tar_pre = $this->columnOwnerMap[$SQLSelectColumn->name];
+                                        }
                                         $resultSetMappingBuilder->addFieldResult(
                                             $SQLSelectColumn->fieldPre == 'sql_pre' ? $tar_pre : $SQLSelectColumn->fieldPre,
                                             $SQLSelectColumn->name,
@@ -478,12 +501,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             }
 
                             if(array_key_exists($ruleColumn->name, $this->rewriteSqls)){
-                                $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
+                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
                             }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSqls)) {
-                                $this->sqlArray[$key] = str_replace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
+                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
                             }else{
-                                $this->sqlArray[$key] = str_replace($field, $ruleColumn->getSql($alias), $value);
-//                                }
+                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, $ruleColumn->getSql($alias), $value);
                             }
                         }
                     }
@@ -498,6 +520,14 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         if(!empty($this->sqlArray['groupBy'])){
             $this->sqlArray['groupBy'] = ' GROUP BY ' . $this->sqlArray['groupBy'];
         }
+    }
+
+    private function rewriteSqlReplace($field, $sql, $value)
+    {
+        $str = str_replace(' '. $field, ' '. $sql, $value);
+        $str = str_replace(','. $field, ','. $sql, $str);
+
+        return $str;
     }
 
     private function rulesProcess(Rules $rules, ResultSetMappingBuilder $resultSetMappingBuilder)
@@ -610,6 +640,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                             $ServiceRuleRepository->sqlArray['join'] .= " {$type} {$tableName} AS {$alias} ON {$on} ";
                             if(!array_key_exists($alias, $resultSetMappingBuilder->aliasMap)){
                                 $resultSetMappingBuilder->addJoinedEntityResult($ruleColumn->targetEntity, $alias, $rule->getPre() == 'sql_pre' ? $this->sqlArray['alias'] : $rule->getPre(), $ruleColumn->propertyName);
+                                $columnOwnerMapKeys = explode('.', trim(explode('=', $on)[0]));
+                                if(isset($columnOwnerMapKeys[1])){
+                                    $this->columnOwnerMap[$columnOwnerMapKeys[1]] = $alias;
+                                }
                             }
                         }
                     }

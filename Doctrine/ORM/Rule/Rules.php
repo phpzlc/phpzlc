@@ -2,6 +2,8 @@
 
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule;
 
+use http\Message\Body;
+
 class Rules
 {
     private $rules = [];
@@ -75,9 +77,7 @@ class Rules
             }
         }
 
-        array_push($this->rules, $rule);
-
-        $this->rulesCorrection();
+        $this->rules[$rule->getName()] = $rule;
 
         return $this;
     }
@@ -150,20 +150,6 @@ class Rules
     public function removeRule($rule_name)
     {
         unset($this->rules[$rule_name]);
-    }
-
-    /**
-     * rule 修正
-     */
-    private function rulesCorrection()
-    {
-        $rules = $this->rules;
-
-        $this->rules = [];
-
-        foreach ($rules as $rule){
-            $this->rules[$rule->getName()] = $rule;
-        }
     }
 
     /**
