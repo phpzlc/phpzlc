@@ -50,6 +50,15 @@ class Errors
         return empty(static::$errors) ? false : static::$errors[0];
     }
 
+    /**
+     * 得到错误信息
+     *
+     * @return string
+     */
+    public static function getErrorMsg()
+    {
+        return empty(static::getError()) ? '' : static::getError()->msg;
+    }
 
     /**
      * 是否存在错误
