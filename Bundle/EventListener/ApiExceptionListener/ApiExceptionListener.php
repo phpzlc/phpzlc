@@ -42,13 +42,13 @@ class ApiExceptionListener
                 $event->getThrowable()->getData(),
                 $event->getThrowable()->getType()
             ));
-        }
-
-        // 生产模式 隐藏500错误
-        if($_ENV['APP_ENV'] == 'prod'){
-            $event->setResponse(Errors::exceptionError($event->getThrowable(), false, $this->request));
         }else{
-            throw $event->getThrowable();
+            // 生产模式 隐藏500错误
+            if($_ENV['APP_ENV'] == 'prod'){
+                $event->setResponse(Errors::exceptionError($event->getThrowable(), false, $this->request));
+            }else{
+                throw $event->getThrowable();
+            }
         }
     }
 }
