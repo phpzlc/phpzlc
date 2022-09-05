@@ -217,6 +217,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
         //处理
         $this->process($this->runRules, $this->runResultSetMappingBuilder, $aliasChain);
+
+        $this->setQuerySelect('');
     }
 
     /**

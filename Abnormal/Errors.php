@@ -1,6 +1,8 @@
 <?php
 namespace PHPZlc\PHPZlc\Abnormal;
 
+
+use Matrix\Exception;
 use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use PHPZlc\PHPZlc\Responses\Responses;
@@ -59,6 +61,7 @@ class Errors
     {
         return empty(static::getError()) ? '' : static::getError()->msg;
     }
+
 
     /**
      * 是否存在错误
@@ -207,6 +210,15 @@ class Errors
                 }
             }
 
+            $userInfo = '[UserAuthId]';
+
+            if(class_exists('\App\Business\AuthBusiness\CurAuthSubject')){
+                $userAuth = \App\Business\AuthBusiness\CurAuthSubject::getCurUserAuth();
+                if(!empty($userAuth)){
+                    $userInfo .= ' ' . $userAuth->getId();
+                }
+            }
+
             $logContent = <<<EOF
 \n
 [Msg] $networkErrorMessage 
@@ -216,6 +228,7 @@ class Errors
 [Headers] {$header_content}
 [Cookies] {$cookies_content}
 [Post] {$post_params_content}
+{$userInfo}
 [END]
 \n
 EOF;
@@ -243,6 +256,7 @@ EOF;
 [Headers] {$header_content}  <br>
 [Cookies] {$cookies_content}  <br>
 [Post] {$post_params_content}  <br>
+{$userInfo} <br>
 [END]
 EOF;
 
