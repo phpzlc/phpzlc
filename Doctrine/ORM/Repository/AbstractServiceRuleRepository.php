@@ -115,6 +115,13 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      */
     private $columnOwnerMap = [];
 
+    /**
+     * 只查询 select
+     *
+     * @var string
+     */
+    private $querySelect;
+
 ##############################  表属性 start ##################################
 
     public function getTableName()
@@ -131,6 +138,24 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     {
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    private function getQuerySelect(): ?string
+    {
+        return $this->querySelect;
+    }
+
+    /**
+     * @param string $querySelect
+     */
+    protected function setQuerySelect(string $querySelect): void
+    {
+        $this->querySelect = $querySelect;
+    }
+
+
 
 #################################   规则 start ##################################
 
@@ -483,6 +508,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
         //字段替换
         $aliasChainParser = $this->aliasChainParser($aliasChain);
+
+        if(!empty($this->getQuerySelect())){
+            $this->sqlArray['select'] = $this->getQuerySelect();
+        }
+
         foreach ($sqlParser->getUseFieldsOFPreGrouping() as $pre => $fields){
             $classRuleMetadata = $this->classRuleMetadataOfPre($pre, $resultSetMappingBuilder);
             if(!empty($classRuleMetadata)){
@@ -526,6 +556,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     {
         $str = str_replace(' '. $field, ' '. $sql, $value);
         $str = str_replace(','. $field, ','. $sql, $str);
+        $str = str_replace('('. $field, '('. $sql, $str);
 
         return $str;
     }
@@ -732,7 +763,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
 
 #################################   工具 start ##################################
 
-    private function generateSql()
+    protected function generateSql()
     {
         return "SELECT {$this->sqlArray['select']} FROM {$this->sqlArray['from']} {$this->sqlArray['alias']} {$this->sqlArray['join']} WHERE 1 {$this->sqlArray['where']} {$this->sqlArray['groupBy']} {$this->sqlArray['orderBy']}";
     }

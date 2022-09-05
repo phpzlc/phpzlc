@@ -184,18 +184,19 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     /**
      * 得到指定字段
      *
-     * @param $column
+     * @param string $column
      * @param $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param $aliasChain
-     * @return false|mixed
+     * @return false|string|integer
      * @throws \Doctrine\DBAL\Exception
      */
     final public function findColumn($column, $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
+        $this->setQuerySelect($column);
+        $rules = new Rules($rules);
+        $rules->addRule(new Rule(Rule::R_SELECT, $column, Rule::REPLACE));
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
-        $this->sqlArray['select'] = $column;
-        $this->sqlArray['orderBy'] = '';
 
         return $this->_em->getConnection()->fetchOne($this->getSql());
     }
