@@ -221,9 +221,9 @@ class Errors
 
             $logContent = <<<EOF
 \n
+[MESSAGE] {$exception->getMessage()}
 [Msg] $networkErrorMessage 
 [Url] {$method}:{$url} [IP] {$ip}
-[MESSAGE] {$exception->getMessage()}
 [FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()} 
 [Headers] {$header_content}
 [Cookies] {$cookies_content}
