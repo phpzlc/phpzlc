@@ -248,10 +248,10 @@ EOF;
 
                     $time = date('Y-m-d H:i:s');
                     $logHtml = <<<EOF
+[MESSAGE] {$exception->getMessage()}  <br>
 [Time] {$time} <br>
 [Msg] $networkErrorMessage <br>
 [Url] {$method}:{$url} [IP] {$ip}  <br>
-[MESSAGE] {$exception->getMessage()}  <br>
 [FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()}  <br>
 [Headers] {$header_content}  <br>
 [Cookies] {$cookies_content}  <br>
