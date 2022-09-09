@@ -2,17 +2,13 @@
 namespace PHPZlc\PHPZlc\Abnormal;
 
 
-use Matrix\Exception;
 use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use PHPZlc\PHPZlc\Responses\Responses;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Mailer;
 
 class Errors
 {
@@ -219,20 +215,23 @@ class Errors
                 }
             }
 
+            $time = date('Y-m-d H:i:s');
             $logContent = <<<EOF
-\n
+
 [MESSAGE] {$exception->getMessage()}
-[Msg] $networkErrorMessage 
+[FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()}
 [Url] {$method}:{$url} [IP] {$ip}
-[FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()} 
+[TRACE]
+{$exception->getTraceAsString()}
 [Headers] {$header_content}
 [Cookies] {$cookies_content}
 [Post] {$post_params_content}
 {$userInfo}
+[Msg] $networkErrorMessage
+[Time] {$time}
 [END]
 \n
 EOF;
-
             //记录日志
             Log::writeLog($logContent);
 
@@ -246,29 +245,16 @@ EOF;
                         $configs[$value[0]] = $value[1];
                     }
 
-                    $time = date('Y-m-d H:i:s');
-                    $logHtml = <<<EOF
-[MESSAGE] {$exception->getMessage()}  <br>
-[Time] {$time} <br>
-[Msg] $networkErrorMessage <br>
-[Url] {$method}:{$url} [IP] {$ip}  <br>
-[FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()}  <br>
-[Headers] {$header_content}  <br>
-[Cookies] {$cookies_content}  <br>
-[Post] {$post_params_content}  <br>
-{$userInfo} <br>
-[END]
-EOF;
-
+                    $traceAsString = str_replace("\n", "<br>", $exception->getTraceAsString());
                     $to = explode('&', $configs['to']);
-                    $transport = Transport::fromDsn($_ENV['MAILER_DSN']);
-                    $mailer = new Mailer($transport);
+                    $transport = \Symfony\Component\Mailer\Transport::fromDsn($_ENV['MAILER_DSN']);
+                    $mailer = new \Symfony\Component\Mailer\Mailer($transport);
                     $email = (new \Symfony\Component\Mime\Email())
                         ->from($configs['from'])
                         ->to($to[0])
                         ->subject($configs['subject'])
-                        ->text($logContent)
-                        ->html($logHtml);
+                        ->text(trim($logContent))
+                        ->html(str_replace("\n", "<br>", trim($logContent)));
 
                     if(count($to) > 1){
                         for ($i = 1; $i < count($to); $i++){
