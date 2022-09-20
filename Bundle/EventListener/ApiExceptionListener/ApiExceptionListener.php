@@ -36,6 +36,8 @@ class ApiExceptionListener
     {
         // API 主动抛出返回响应
         if($event->getThrowable() instanceof ApiException){
+            ob_clean();
+            $event->allowCustomResponseCode();
             $event->setResponse(Responses::error(
                 $event->getThrowable()->getMessage(),
                 $event->getThrowable()->getCode(),
@@ -45,6 +47,8 @@ class ApiExceptionListener
         }else{
             // 生产模式 隐藏500错误
             if($_ENV['APP_ENV'] == 'prod'){
+                ob_clean();
+                $event->allowCustomResponseCode();
                 $event->setResponse(Errors::exceptionError($event->getThrowable(), false, $this->request));
             }else{
                 throw $event->getThrowable();
