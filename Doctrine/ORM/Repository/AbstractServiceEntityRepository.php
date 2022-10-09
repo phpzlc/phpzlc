@@ -164,7 +164,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
      * @param Rules|array|null $rules
      * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
      * @param string $aliasChain
-     * @return array|mixed
+     * @return integer
      */
     final public function findCount($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
     {
@@ -178,7 +178,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
             $this->sqlArray['groupBy'] = '';
         }
 
-        return $this->_em->getConnection()->fetchOne($this->getSql());
+        return (int)$this->_em->getConnection()->fetchOne($this->getSql());
     }
 
     /**
