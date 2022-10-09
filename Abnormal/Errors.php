@@ -143,7 +143,11 @@ class Errors
     public static function exceptionError(\Throwable $exception, bool $isThrow = true, RequestStack $request = null)
     {
         if($isThrow){
-            throw $exception;
+            if(Errors::isExistError()){
+                return false;
+            }else{
+                throw $exception;
+            }
         }
 
         if($exception instanceof NotFoundHttpException) {
