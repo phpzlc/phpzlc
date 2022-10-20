@@ -23,10 +23,11 @@
     },
     "require": {
         "php": ">=7.2.5",
-        "symfony/framework-bundle": ">=5.4",
+        "symfony/framework-bundle": "^5.4|^6.0",
         "phpmyadmin/sql-parser": "^5.0",
         "ramsey/uuid": "^4.1",
         "phpzlc/validate": "*",
-        "phpzlc/document-bundle": "*"
+        "phpzlc/document-bundle": "*",
+        "doctrine/doctrine-fixtures-bundle": "*"
     }
 }
