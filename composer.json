@@ -27,7 +27,6 @@
         "phpmyadmin/sql-parser": "^5.0",
         "ramsey/uuid": "^4.1",
         "phpzlc/validate": "*",
-        "phpzlc/document-bundle": "*",
-        "doctrine/doctrine-fixtures-bundle": ">=1.5"
+        "phpzlc/document-bundle": "*"
     }
 }
