@@ -4,7 +4,6 @@
     "homepage": "https://phpzlc.com/",
     "license": "MIT",
     "type": "library",
-    "minimum-stability": "dev",
     "keywords": [
         "phpzlc", "symfony"
     ],
