@@ -350,8 +350,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         //>> 整理SQL 如果主表主键没有查询则对象不会生成
         //> 识别 * 字段  将*替换成具体的字段 如果存在需要重新分析SQL
         $isSqlParsers = false;
-//        dump(($sqlParser->selectColumnsOfColumn));
-//        dump($this->sqlArray);exit;
+        $sqlParser = new SQLParser($this->generateSql());
+
         foreach ($sqlParser->selectColumnsOfColumn as $column => $SQLSelectColumn){
             if($SQLSelectColumn->isField) {
                 if (empty($SQLSelectColumn->fieldPre)) {
