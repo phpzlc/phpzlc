@@ -140,6 +140,13 @@ class Errors
         return true;
     }
 
+    /**
+     * 报错通知
+     *
+     * @param $logContent
+     * @return void
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     public static function notificationError($logContent)
     {
         //发送报错邮件给开发者
@@ -180,6 +187,16 @@ class Errors
         }
     }
 
+    /**
+     * exception错误
+     *
+     * @param \Throwable $exception
+     * @param bool $isThrow
+     * @param RequestStack|null $request
+     * @return false|\Symfony\Component\HttpFoundation\JsonResponse|Response|void
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws \Throwable
+     */
     public static function exceptionError(\Throwable $exception, bool $isThrow = true, RequestStack $request = null)
     {
         if($isThrow){
