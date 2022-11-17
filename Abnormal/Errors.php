@@ -140,6 +140,46 @@ class Errors
         return true;
     }
 
+    public static function notificationError($logContent)
+    {
+        //发送报错邮件给开发者
+        if(isset($_ENV['MAILER_DSN']) && isset($_ENV['ERROR_EMAIL_COF'])){
+            try {
+                $configParams = explode(';', $_ENV['ERROR_EMAIL_COF']);
+                $configs = [];
+                foreach ($configParams as $configParam){
+                    $value = explode(":", $configParam);
+                    $configs[$value[0]] = $value[1];
+                }
+
+                $to = explode('&', $configs['to']);
+                $transport = \Symfony\Component\Mailer\Transport::fromDsn($_ENV['MAILER_DSN']);
+                $mailer = new \Symfony\Component\Mailer\Mailer($transport);
+                $email = (new \Symfony\Component\Mime\Email())
+                    ->from($configs['from'])
+                    ->to($to[0])
+                    ->subject($configs['subject'])
+                    ->text(trim($logContent))
+                    ->html(str_replace("\n", "<br>", trim($logContent)));
+
+                if(count($to) > 1){
+                    for ($i = 1; $i < count($to); $i++){
+                        $email->addTo($to[$i]);
+                    }
+                }
+
+            }catch (\Exception $exception){
+                die('ERROR_EMAIL_COF 格式错误 ' . $exception->getMessage());
+            }
+
+            try {
+                $mailer->send($email);
+            } catch (\Exception $exception){
+                Log::writeLog('程序500错误邮件发送失败' . $exception->getMessage());
+            }
+        }
+    }
+
     public static function exceptionError(\Throwable $exception, bool $isThrow = true, RequestStack $request = null)
     {
         if($isThrow){
@@ -240,42 +280,7 @@ EOF;
             Log::writeLog($logContent);
 
             //发送报错邮件给开发者
-            if(isset($_ENV['MAILER_DSN']) && isset($_ENV['ERROR_EMAIL_COF'])){
-                try {
-                    $configParams = explode(';', $_ENV['ERROR_EMAIL_COF']);
-                    $configs = [];
-                    foreach ($configParams as $configParam){
-                        $value = explode(":", $configParam);
-                        $configs[$value[0]] = $value[1];
-                    }
-
-                    $traceAsString = str_replace("\n", "<br>", $exception->getTraceAsString());
-                    $to = explode('&', $configs['to']);
-                    $transport = \Symfony\Component\Mailer\Transport::fromDsn($_ENV['MAILER_DSN']);
-                    $mailer = new \Symfony\Component\Mailer\Mailer($transport);
-                    $email = (new \Symfony\Component\Mime\Email())
-                        ->from($configs['from'])
-                        ->to($to[0])
-                        ->subject($configs['subject'])
-                        ->text(trim($logContent))
-                        ->html(str_replace("\n", "<br>", trim($logContent)));
-
-                    if(count($to) > 1){
-                        for ($i = 1; $i < count($to); $i++){
-                            $email->addTo($to[$i]);
-                        }
-                    }
-
-                }catch (\Exception $exception){
-                    die('ERROR_EMAIL_COF 格式错误 ' . $exception->getMessage());
-                }
-
-                try {
-                    $mailer->send($email);
-                } catch (\Exception $exception){
-                    Log::writeLog('程序500错误邮件发送失败' . $exception->getMessage());
-                }
-            }
+            self::notificationError($logContent);
         }
 
         switch (SystemBaseController::getReturnType()) {
