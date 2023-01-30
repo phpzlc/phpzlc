@@ -26,6 +26,7 @@
         "symfony/framework-bundle": "^5.4|^6.0|^6.1",
         "phpmyadmin/sql-parser": "^5.0|^5.5",
         "ramsey/uuid": "^4.1|^4.5",
+        "phpzlc/flex": "*",
         "phpzlc/validate": "*",
         "phpzlc/document-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "*"
