@@ -133,7 +133,7 @@ class Errors
         $errors = $validator->validate($class);
 
         if(count($errors) > 0){
-            Errors::setError(new Error($errors->get(0)->getMessage(), 1, $errors->get(0)->getPropertyPath(), $errors->get(0)->getInvalidValue()));
+            Errors::setError(new Error($errors->get(0)->getMessage(), null, $errors->get(0)->getPropertyPath(), $errors->get(0)->getInvalidValue()));
             return false;
         }
 

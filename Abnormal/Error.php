@@ -45,7 +45,7 @@ class Error
      */
     public function __construct($msg, $code = '$_ENV[API_ERROR_CODE]def(1)', $name = '', $value = '', $group = '', $other = array())
     {
-        if($code == '$_ENV[API_ERROR_CODE]def(1)'){
+        if(empty($code) || $code == '$_ENV[API_ERROR_CODE]def(1)'){
             $code =  array_key_exists('API_ERROR_CODE', $_ENV) ? $_ENV['API_ERROR_CODE'] : 1;
         }
 
@@ -62,7 +62,10 @@ class Error
     {
         $masInfo = $this->other;
         if(!empty($this->name)) {
-            $masInfo['name'] = $this->name;
+            $masInfo['keyValue'] = [
+                "key" => $this->name,
+                "value" => $this->value,
+            ];
         }
 
         return $masInfo;
