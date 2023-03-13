@@ -10,6 +10,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use http\Message\Body;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
@@ -521,6 +522,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                 foreach ($fields as $field => $fieldParam){
                     $ruleColumn = $classRuleMetadata->getRuleColumnOfRuleSuffixName($fieldParam['column']);
                     if(!empty($ruleColumn)){
+                        if($pre == 'sql_pre'){
+                            $serviceRuleRepositoryClass = $this;
+                        }else {
+                            $serviceRuleRepositoryClass = $this->getServiceRuleRepository($pre, $resultSetMappingBuilder->aliasMap[$pre]);
+                        }
                         foreach ($this->sqlArray as $key => $value){
                             //如果表外字段在select中存在则直接使用select中的字段名;表外字段一般为子查询；直接取字段名可以避免重复子查询
 //                            if($key == 'orderBy' && isset($sqlParser->selectColumnsOfColumn[$field])){
@@ -532,10 +538,10 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                 $alias = ['sql_pre' => $pre];
                             }
 
-                            if(array_key_exists($ruleColumn->name, $this->rewriteSqls)){
-                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->name], $alias), $value);
-                            }elseif(array_key_exists($ruleColumn->propertyName, $this->rewriteSqls)) {
-                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($this->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
+                            if(array_key_exists($ruleColumn->name, $serviceRuleRepositoryClass->rewriteSqls)){
+                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->name], $alias), $value);
+                            }elseif(array_key_exists($ruleColumn->propertyName, $serviceRuleRepositoryClass->rewriteSqls)) {
+                                $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
                             }else{
                                 $this->sqlArray[$key] = $this->rewriteSqlReplace($field, $ruleColumn->getSql($alias), $value);
                             }
