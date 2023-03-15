@@ -149,6 +149,9 @@ class Errors
      */
     public static function notificationError($logContent)
     {
+        //记录日志
+        Log::writeLog($logContent);
+
         //发送报错邮件给开发者
         if(isset($_ENV['MAILER_DSN']) && isset($_ENV['ERROR_EMAIL_COF'])){
             try {
@@ -293,8 +296,6 @@ class Errors
 [END]
 \n
 EOF;
-            //记录日志
-            Log::writeLog($logContent);
 
             //发送报错邮件给开发者
             self::notificationError($logContent);
