@@ -24,6 +24,18 @@ class Responses
 
     const RESPONSE_DEBUG = 'debug';
 
+    /**
+     * 全局返回参数
+     *
+     * @var array
+     */
+    private static $global = [];
+
+    public static function addGlobalData($key, $data)
+    {
+        self::$global[$key] = $data;
+    }
+
     public static function getEnvValue($key, $def)
     {
         return array_key_exists($key, $_ENV) ? $_ENV[$key] : $def;
@@ -58,57 +70,14 @@ class Responses
         return static::value($error->code, $error->msg, $error->getMsgInfo(), $data, $type);
     }
 
-
-    public static function exceptionError(\Exception $exception)
-    {
-        if($exception instanceof NotFoundHttpException) {
-            throw new NotFoundHttpException();
-        }
-
-        $networkErrorMessage = static::getEnvValue('API_EXCEPTION_ERROR_MSG', '响应异常，服务发生错误');
-        $netWorkErrorCode =  static::getEnvValue('API_EXCEPTION_ERROR_CODE', 500);
-
-        if(Errors::isExistError()){
-            $error = Errors::getError();
-        }else{
-            $error = new Error(
-                $networkErrorMessage,
-                $netWorkErrorCode,
-                '',
-                '',
-                '',
-                array(
-                    '[EXCEPTION_MESSAGE]' =>  $exception->getMessage(),
-                    '[EXCEPTION_DATETIME]' =>  date('Y-m-d H:i:s')
-                )
-            );
-
-            //记录日志
-            Log::writeLog(' [EXCEPTION_MESSAGE] ' .  $exception->getMessage() .
-                ' [EXCEPTION_FILE] ' .  $exception->getFile() .
-                ' [EXCEPTION_CODE] ' .  $exception->getCode() .
-                ' [EXCEPTION_LINE] '.  $exception->getLine() .
-                ' [ERROR] ' . $networkErrorMessage);
-        }
-
-        switch (SystemBaseController::getReturnType()) {
-            case SystemBaseController::RETURN_SHOW_RESOURCE:
-                throw new NotFoundHttpException($networkErrorMessage);
-                break;
-            case SystemBaseController::RETURN_HIDE_RESOURCE:
-                return Responses::error($error);
-            default:
-                return new Response($networkErrorMessage, $netWorkErrorCode);
-        }
-    }
-
     private static function value($code, $msg, $msgInfo, $data, $type)
     {
         $result = array(
             'code' => $code,
             'msg' => $msg,
             'msgInfo' => $msgInfo,
-            'data' => $data
+            'data' => $data,
+            'system' => self::$global
         );
 
         if($type == self::RESPONSE_JSON){
