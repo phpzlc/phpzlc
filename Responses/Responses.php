@@ -36,6 +36,15 @@ class Responses
         self::$global[$key] = $data;
     }
 
+    public static function getGlobalData($key, $def = null)
+    {
+        if(array_key_exists($key, self::$global)){
+            return self::$global[$key];
+        }else{
+            return $def;
+        }
+    }
+
     public static function getEnvValue($key, $def)
     {
         return array_key_exists($key, $_ENV) ? $_ENV[$key] : $def;
