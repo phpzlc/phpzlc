@@ -45,6 +45,13 @@ class Responses
         }
     }
 
+    public static function removeGlobalData($key)
+    {
+        if(array_key_exists($key, self::$global)){
+            unset($key);
+        }
+    }
+
     public static function getEnvValue($key, $def)
     {
         return array_key_exists($key, $_ENV) ? $_ENV[$key] : $def;
