@@ -29,13 +29,13 @@ class ActionLoad implements EventSubscriberInterface
     /**
      * @var ParameterBagInterface
      */
-    public static $parameterBag;
+    public static $globalParameter;
 
     public function __construct(ContainerInterface $container,  ParameterBagInterface $parameterBag)
     {
         self::$globalContainer = $container;
         self::$globalDoctrine = $container->get('doctrine');
-        self::$parameterBag = $parameterBag;
+        self::$globalParameter = $parameterBag;
     }
 
     public function onKernelController(ControllerEvent $event)
