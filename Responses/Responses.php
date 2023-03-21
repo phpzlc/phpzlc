@@ -93,7 +93,7 @@ class Responses
             'msg' => $msg,
             'msgInfo' => $msgInfo,
             'data' => $data,
-            'system' => self::$global
+            'system' => empty(self::$global) ? null : self::$global
         );
 
         if($type == self::RESPONSE_JSON){
