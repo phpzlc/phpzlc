@@ -31,10 +31,10 @@ class ActionLoad implements EventSubscriberInterface
      */
     public static $globalParameter;
 
-    public function __construct(ContainerInterface $container,  ParameterBagInterface $parameterBag)
+    public function __construct(ContainerInterface $container, ObjectManager $objectManager, ParameterBagInterface $parameterBag)
     {
         self::$globalContainer = $container;
-        self::$globalDoctrine = $container->get('doctrine');
+        self::$globalDoctrine = $objectManager;
         self::$globalParameter = $parameterBag;
     }
 
