@@ -1,7 +1,7 @@
 services:
     phpzlc.saftey.action_load:
         class: PHPZlc\PHPZlc\Bundle\Safety\ActionLoad
-        arguments: ['@service_container']
+        arguments: ['@service_container', '@parameter_bag']
         tags:
             - { name: kernel.event_subscriber, event: kernel.controller, method: onKernelController }
 

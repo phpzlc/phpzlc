@@ -12,6 +12,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ActionLoad implements EventSubscriberInterface
 {
@@ -25,10 +26,16 @@ class ActionLoad implements EventSubscriberInterface
      */
     public static $globalDoctrine;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var ParameterBagInterface
+     */
+    public static $parameterBag;
+
+    public function __construct(ContainerInterface $container,  ParameterBagInterface $parameterBag)
     {
         self::$globalContainer = $container;
         self::$globalDoctrine = $container->get('doctrine');
+        self::$parameterBag = $parameterBag;
     }
 
     public function onKernelController(ControllerEvent $event)
