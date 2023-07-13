@@ -66,6 +66,10 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
 
         $this->getSql();
 
+        if(empty($page)){
+            $page = 1;
+        }
+
         $query = $this->_em->createNativeQuery($this->sql . " LIMIT " . (($page - 1) * $rows) . ", {$rows}", $this->runResultSetMappingBuilder);
 
         return $query->getResult();
