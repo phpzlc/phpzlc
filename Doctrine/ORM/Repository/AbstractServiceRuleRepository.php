@@ -55,7 +55,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'finalOrderBy' => '',
         'primaryKey' => '',
         'aliasIncrease' => '',
-        'falseDeleteField' => ''
+        'falseDeleteField' => '',
+        'otherRes' => [],
     );
 
     public $telSqlArray = array(
@@ -69,7 +70,8 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         'finalOrderBy' => '',
         'primaryKey' => '',
         'aliasIncrease' => 0,
-        'falseDeleteField' => ''
+        'falseDeleteField' => '',
+        'otherRes' => [],
     );
 
     /**
@@ -759,7 +761,11 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     private function getServiceRuleRepository($pre = 'sql_pre', $entityName = null)
     {
         if ($pre != $this->sqlArray['alias']) {
-            $ServiceRuleRepository = clone $this->getEntityManager()->getRepository($entityName);
+            if(!array_key_exists($pre, $this->sqlArray['otherRes'])){
+                $this->sqlArray['otherRes'][$pre] =  clone $this->getEntityManager()->getRepository($entityName);
+
+            }
+            $ServiceRuleRepository =$this->sqlArray['otherRes'][$pre];
             $ServiceRuleRepository->sqlArray = $ServiceRuleRepository->telSqlArray;
             $ServiceRuleRepository->sqlArray['alias'] = $pre;
         } else {
