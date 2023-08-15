@@ -759,7 +759,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
     private function getServiceRuleRepository($pre = 'sql_pre', $entityName = null)
     {
         if ($pre != $this->sqlArray['alias']) {
-            $ServiceRuleRepository = $this->getEntityManager()->getRepository($entityName);
+            $ServiceRuleRepository = clone $this->getEntityManager()->getRepository($entityName);
             $ServiceRuleRepository->sqlArray = $ServiceRuleRepository->telSqlArray;
             $ServiceRuleRepository->sqlArray['alias'] = $pre;
         } else {
