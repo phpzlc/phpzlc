@@ -2,8 +2,6 @@
 
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Rule;
 
-use http\Message\Body;
-
 class Rules
 {
     private $rules = [];
@@ -35,7 +33,6 @@ class Rules
     public function addRules($rules)
     {
         if(!empty($rules)) {
-
             if(is_array($rules)){
                 return $this->addArrayRule($rules);
             }
@@ -54,7 +51,11 @@ class Rules
     private function addArrayRule(array $array_rule)
     {
         foreach ($array_rule as $rule => $value){
-            $this->addRule(new Rule($rule, $value));
+            if($value instanceof Rule){
+                $this->addRule($value);
+            }else{
+                $this->addRule(new Rule($rule, $value));
+            }
         }
 
         return $this;
@@ -166,8 +167,4 @@ class Rules
 
         return $rules;
     }
-
-
 }
-
-
