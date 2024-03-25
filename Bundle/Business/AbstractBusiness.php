@@ -42,6 +42,15 @@ abstract class AbstractBusiness extends AbstractController
         }
     }
 
+    protected function getParameter(string $name)
+    {
+        if($this->container->has('parameter_bag')){
+            return parent::getParameter($name);
+        }
+
+        return ActionLoad::$globalParameter->get($name);
+    }
+
     public function validator($class) : bool
     {
         return Errors::validate(self::$validation, $class);
