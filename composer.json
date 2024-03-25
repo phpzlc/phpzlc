@@ -26,9 +26,6 @@
         "symfony/framework-bundle": "7.0.*",
         "phpmyadmin/sql-parser": "*",
         "ramsey/uuid": "*",
-        "phpzlc/flex": "*",
-        "phpzlc/validate": "*",
-        "phpzlc/document-bundle": "*",
         "doctrine/doctrine-fixtures-bundle": "*"
     }
 }
