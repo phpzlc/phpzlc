@@ -7,10 +7,9 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Doctrine\ORM\Repository\AbstractServiceEntityRepository;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
-use PHPZlc\Validate\Validate;
 
 /**
-* @extends ServiceEntityRepository<<?= $entity_class_name; ?>>
+* @extends AbstractServiceEntityRepository<<?= $entity_class_name; ?>>
 *
 * @method <?= $entity_class_name; ?>|null find($id, $lockMode = null, $lockVersion = null)
 * @method <?= $entity_class_name; ?>|null findOneBy(array $criteria, array $orderBy = null)
@@ -27,14 +26,14 @@ class <?= $class_name; ?> extends AbstractServiceEntityRepository
     {
         parent::__construct($registry, <?= $entity_class_name; ?>::class);
     }
-    
+
     public function registerRules()
     {
-        // TODO: Implement registerRules() method.
+        // TODO: Implement registerRules() method (<?= $entity_class_name; ?>规则注册).
     }
-    
+
     public function ruleRewrite(Rule $currentRule, Rules $rules, ResultSetMappingBuilder $resultSetMappingBuilder)
     {
-        // TODO: Implement ruleRewrite() method.
+        // TODO: Implement ruleRewrite() method (<?= $entity_class_name; ?>规则实现).
     }
 }

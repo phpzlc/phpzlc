@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class ActionLoad implements EventSubscriberInterface
 {
+
     /**
      * @var ContainerInterface
      */

@@ -34,7 +34,6 @@ class ApiExceptionListener
 
     public function onKernelException(ExceptionEvent $event)
     {
-        // API 主动抛出返回响应
         if($event->getThrowable() instanceof ApiException){
             ob_clean();
             $event->allowCustomResponseCode();

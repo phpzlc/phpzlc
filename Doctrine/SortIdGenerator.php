@@ -1,13 +1,13 @@
 <?php
 namespace PHPZlc\PHPZlc\Doctrine;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Id\AbstractIdGenerator;
 use Ramsey\Uuid\Uuid;
 
 class SortIdGenerator extends AbstractIdGenerator
 {
-    function generate(EntityManager $em, $entity)
+    public function generateId(EntityManagerInterface $em, ?object $entity): mixed
     {
         $uuid = Uuid::uuid1()->toString();
 

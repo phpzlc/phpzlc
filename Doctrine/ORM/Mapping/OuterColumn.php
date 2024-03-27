@@ -1,35 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Mapping;
 
-use Doctrine\Common\Annotations\Annotation\Target;
-use Doctrine\ORM\Mapping\Annotation;
+use Attribute;
+use Doctrine\ORM\Mapping\MappingAttribute;
 
-/**
- * Class OuterColumn
- * @package PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn
- * @Annotation
- * @Target({"PROPERTY"})
- */
-final class OuterColumn implements Annotation
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class OuterColumn implements MappingAttribute
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var mixed
-     */
-    public $type = 'string';
-
-    /**
-     * @var string
-     */
-    public $sql;
-
-    /**
-     * @var array
-     */
-    public $options = [];
+    public function __construct(
+        public readonly string|null $name = null,
+        public readonly string|null $type = 'string',
+        public readonly string|null $sql = null,
+        public readonly array $options = [],
+    ){
+    }
 }

@@ -7,6 +7,7 @@
 
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Repository;
 
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
@@ -32,20 +33,11 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $this->_em->getConnection()->fetchOne($this->getSql()) == '1' ? true : false;
     }
 
-
-    /**
-     * 在全部数据中检索
-     *
-     * @param Rules|array|null $rules
-     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
-     * @param string $aliasChain
-     * @return array|mixed
-     */
-    final public function findAll($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    public function findAll($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = ''): array
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->getSql();
-        $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);
+        $query = $this->getEntityManager()->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);
 
         return $query->getResult();
     }
@@ -220,12 +212,12 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         return $this->getSql();
     }
 
-    final public function findOneBy(array $criteria, array $orderBy = null)
+    final public function findOneBy(array $criteria, ?array $orderBy = null): object|null
     {
         return $this->findAssoc($criteria);
     }
 
-    final public function find($id, $lockMode = null, $lockVersion = null)
+    public function find(mixed $id, int|LockMode|null $lockMode = null, ?int $lockVersion = null): object|null
     {
         if(is_array($id) || is_object($id)){
             return $this->findAssoc($id);

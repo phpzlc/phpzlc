@@ -5,45 +5,23 @@
  * Date: 2019/8/8
  */
 
+declare(strict_types=1);
+
 namespace PHPZlc\PHPZlc\Doctrine\ORM\Mapping;
 
-use Doctrine\Common\Annotations\Annotation\Target;
-use Doctrine\ORM\Mapping\Annotation;
+use Attribute;
+use Doctrine\ORM\Mapping\MappingAttribute;
+use PHPZlc\PHPZlc\Doctrine\ORM\Rule\InterfaceJoint;
 
-/**
- * Class OuterColumn
- * @package PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn
- * @Annotation
- * @Target({"PROPERTY"})
- */
-final class AddRule implements Annotation
+#[Attribute(Attribute::TARGET_PROPERTY)]
+final class AddRule implements MappingAttribute
 {
-    /**
-     * 规则名称
-     *
-     * @var string
-     */
-    public $name;
-
-    /**
-     * 规则内容
-     */
-    public $value;
-
-    /**
-     * 碰撞规则
-     *
-     * @var string
-     */
-    public $collision;
-
-    /**
-     * @var JointInterface
-     */
-    public $jointClass;
-
-    /**
-     * @var string
-     */
-    public $jointSort;
+    public function __construct(
+        public readonly string|null $name = null,
+        public readonly string|null $value = null,
+        public readonly string|null $collision = null,
+        public readonly InterfaceJoint|null $jointClass = null,
+        public readonly string|null $jointSort = null,
+    ){
+    }
 }

@@ -7,7 +7,6 @@
 
 namespace PHPZlc\PHPZlc\Doctrine\ORM\RuleColumn;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use PHPZlc\PHPZlc\Abnormal\PHPZlcException;
 use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rule;
@@ -160,10 +159,11 @@ class ClassRuleMetaData
      */
     public function getCommentOfField($fieldName)
     {
+
         if(array_key_exists($fieldName, $this->_class->fieldMappings)){
-            if(array_key_exists('options', $this->_class->fieldMappings[$fieldName])){
-                if(array_key_exists('comment', $this->_class->fieldMappings[$fieldName]['options'])){
-                    return $this->_class->fieldMappings[$fieldName]['options']['comment'];
+            if(!empty($this->_class->fieldMappings[$fieldName]->options)){
+                if(array_key_exists("comment", $this->_class->fieldMappings[$fieldName]->options)){
+                    return $this->_class->fieldMappings[$fieldName]->options["comment"];
                 }
             }
         }
@@ -174,8 +174,8 @@ class ClassRuleMetaData
     public function getNullableOfField($fieldName)
     {
         if(array_key_exists($fieldName, $this->_class->fieldMappings)){
-            if(array_key_exists('nullable', $this->_class->fieldMappings[$fieldName])){
-                return $this->_class->fieldMappings[$fieldName]['nullable'];
+            if(!empty($this->_class->fieldMappings[$fieldName]->nullable)){
+                return true;
             }
         }
         
@@ -223,39 +223,43 @@ class ClassRuleMetaData
             }
         }
 
-        //表之外字段
-        $reader = new AnnotationReader();
-        $reflClass = new \ReflectionClass($classMetadata->getName());
-
-        foreach ($reflClass->getProperties() as $property => $reflectionProperty) {
-            $propertyOuterColumnAnnotation = $reader->getPropertyAnnotation($reflectionProperty, \PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn::class);
-            if(!empty($propertyOuterColumnAnnotation)){
+        //表外字段
+        foreach ($classMetadata->reflClass->getProperties() as  $reflectionProperty) {
+            $attributes = $reflectionProperty->getAttributes(\PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn::class);
+            foreach ($attributes as $attribute) {
+                $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
+                $comment = isset($attribute->getArguments()['comment']) ? $attribute->getArguments()['comment'] : '';
+                $type = isset($attribute->getArguments()['type']) ? $attribute->getArguments()['type'] : '';
+                $sql = isset($attribute->getArguments()['sql']) ? $attribute->getArguments()['sql'] : '';
                 $this->ruleColumns[$reflectionProperty->getName()] = new RuleColumn(
-                    $propertyOuterColumnAnnotation->name,
+                    empty($name) ? $reflectionProperty->getName() : $name,
                     $reflectionProperty->getName(),
-                    isset($propertyOuterColumnAnnotation->options['comment']) ? $propertyOuterColumnAnnotation->options['comment'] : '',
-                    $propertyOuterColumnAnnotation->type,
+                    $comment,
+                   $type,
                     RuleColumn::PT_TABLE_OUT,
-                    $propertyOuterColumnAnnotation->sql,
-                    $this->getNullableOfField($fieldName),
+                    $sql,
+                    false,
                     false
                 );
             }
 
-            $propertyAnnotations = $reader->getPropertyAnnotations($reflectionProperty);
-            foreach ($propertyAnnotations as $propertyAnnotation){
-                if($propertyAnnotation instanceof \PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule){
-                   if(in_array($propertyAnnotation->name, Rule::$defRule)){
-                       throw new PHPZlcException('设置规则不能为默认规则');
-                   }
-                   $this->ruleColumns[$reflectionProperty->getName()]->addRule(new Rule(
-                        $propertyAnnotation->name,
-                        $propertyAnnotation->value,
-                        $propertyAnnotation->collision,
-                        $propertyAnnotation->jointClass,
-                        $propertyAnnotation->jointSort
-                    ));
+            $attributes = $reflectionProperty->getAttributes(\PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule::class);
+            foreach ($attributes as $attribute) {
+                $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
+                $value = isset($attribute->getArguments()['value']) ? $attribute->getArguments()['value'] : '';
+                $collision = isset($attribute->getArguments()['collision']) ? $attribute->getArguments()['collision'] : null;
+                $jointClass = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointClass'] : null;
+                $jointSort = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointSort'] : null;
+                if (in_array($name, Rule::$defRule, true)) {
+                    throw new PHPZlcException('设置规则不能为默认规则');
                 }
+                $this->ruleColumns[$reflectionProperty->getName()]->addRule(new Rule(
+                    $name,
+                    $value,
+                    $collision,
+                    $jointClass,
+                    $jointSort,
+                ));
             }
         }
 

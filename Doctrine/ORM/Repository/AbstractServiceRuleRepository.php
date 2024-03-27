@@ -731,7 +731,7 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
      * @param ResultSetMappingBuilder $resultSetMappingBuilder
      * @return null|ClassRuleMetaData
      */
-    private function classRuleMetadataOfPre($pre = 'sql_pre', ResultSetMappingBuilder $resultSetMappingBuilder)
+    private function classRuleMetadataOfPre($pre, ResultSetMappingBuilder $resultSetMappingBuilder)
     {
         if($pre == 'sql_pre'){
             return $this->getClassRuleMetadata();
@@ -858,7 +858,12 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
         }
 
         foreach ($this->getClassRuleMetadata()->getAllRuleColumn() as $ruleColumn){
-            $methodName = 'get'.Str::asCamelCase($ruleColumn->propertyName);
+            if($ruleColumn->type == 'boolean' || $ruleColumn->type == 'bool'){
+                $methodName = 'is'. Str::asCamelCase($ruleColumn->propertyName);
+            }else{
+                $methodName = 'get'. Str::asCamelCase($ruleColumn->propertyName);
+            }
+
             $methodReturn = $entity->$methodName();
             if(is_object($methodReturn) && !($methodReturn instanceof \DateTime)){
                 try {
