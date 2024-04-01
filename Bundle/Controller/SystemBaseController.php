@@ -7,6 +7,8 @@
 
 namespace PHPZlc\PHPZlc\Bundle\Controller;
 
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 abstract class SystemBaseController extends AbstractController
@@ -32,5 +34,25 @@ abstract class SystemBaseController extends AbstractController
         SystemBaseController::setReturnType($returnType);
 
         return true;
+    }
+
+    /**
+     * Finds an entry of the container by its identifier and returns it.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @throws NotFoundExceptionInterface  No entry was found for **this** identifier.
+     * @throws ContainerExceptionInterface Error while retrieving the entry.
+     *
+     * @return mixed Entry.
+     */
+    public function get(string $id)
+    {
+        switch ($id) {
+            case 'session':
+                return $this->container->get('request_stack')->getCurrentRequest()->getSession();
+        }
+
+        return $this->container->get($id);
     }
 }

@@ -30,7 +30,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->sqlArray['select'] = '1';
 
-        return $this->_em->getConnection()->fetchOne($this->getSql()) == '1' ? true : false;
+        return $this->getEntityManager()->getConnection()->fetchOne($this->getSql()) == '1' ? true : false;
     }
 
     public function findAll($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = ''): array
@@ -79,7 +79,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     {
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
         $this->getSql();
-        $query = $this->_em->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
+        $query = $this->getEntityManager()->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
 
         $result = $query->getResult();
 
@@ -106,7 +106,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->sqlArray['orderBy'] = 'ORDER BY '. "sql_pre.{$this->getPrimaryKey()} DESC";
         $this->getSql();
 
-        $query = $this->_em->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
+        $query = $this->getEntityManager()->createNativeQuery($this->sql . ' LIMIT 1', $this->runResultSetMappingBuilder);
 
         $result = $query->getResult();
 
@@ -141,7 +141,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $this->sqlArray['orderBy'] = '';
         $this->getSql();
 
-        $query = $this->_em->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);;
+        $query = $this->getEntityManager()->createNativeQuery($this->sql, $this->runResultSetMappingBuilder);;
 
         $result = $query->getResult();
 
@@ -194,7 +194,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
         $rules->addRule(new Rule(Rule::R_SELECT, $column, Rule::REPLACE));
         $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
 
-        return $this->_em->getConnection()->fetchOne($this->getSql());
+        return $this->getEntityManager()->getConnection()->fetchOne($this->getSql());
     }
 
     /**

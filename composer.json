@@ -28,6 +28,7 @@
         "ramsey/uuid": "*",
         "doctrine/doctrine-fixtures-bundle": "*",
         "phpzlc/flex": "*",
-        "phpzlc/document-bundle": "*"
+        "phpzlc/document-bundle": "*",
+        "phpzlc/validate": "*"
     }
 }

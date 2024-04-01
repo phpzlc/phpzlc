@@ -1,7 +1,12 @@
 services:
+    PHPZlc\PHPZlc\Bundle\Safety\CommandLoad:
+        arguments: ['@service_container', '@doctrine.orm.entity_manager', '@parameter_bag', '@doctrine.dbal.default_connection', '@validator']
+        tags:
+            - { name: 'kernel.event_listener', event: 'console.command', method: 'onCommand' }
+
     phpzlc.saftey.action_load:
         class: PHPZlc\PHPZlc\Bundle\Safety\ActionLoad
-        arguments: ['@service_container', '@doctrine.orm.entity_manager', '@parameter_bag']
+        arguments: ['@service_container', '@doctrine.orm.entity_manager', '@parameter_bag', '@doctrine.dbal.default_connection', '@validator']
         tags:
             - { name: kernel.event_subscriber, event: kernel.controller, method: onKernelController }
 

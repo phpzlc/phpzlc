@@ -225,7 +225,7 @@ class ClassRuleMetaData
 
         //表外字段
         foreach ($classMetadata->reflClass->getProperties() as  $reflectionProperty) {
-            $attributes = $reflectionProperty->getAttributes(\PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn::class);
+            $attributes = $reflectionProperty->getAttributes('PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn');
             foreach ($attributes as $attribute) {
                 $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
                 $comment = isset($attribute->getArguments()['comment']) ? $attribute->getArguments()['comment'] : '';
@@ -238,12 +238,12 @@ class ClassRuleMetaData
                    $type,
                     RuleColumn::PT_TABLE_OUT,
                     $sql,
-                    false,
+                    true,
                     false
                 );
             }
 
-            $attributes = $reflectionProperty->getAttributes(\PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule::class);
+            $attributes = $reflectionProperty->getAttributes("PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule");
             foreach ($attributes as $attribute) {
                 $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
                 $value = isset($attribute->getArguments()['value']) ? $attribute->getArguments()['value'] : '';

@@ -128,13 +128,13 @@ final class EntityRegenerator
                     default => throw new \Exception('Unknown association type.'),
                 };
             }
-        }
 
-        //PHPZLC 重写 - 为表外字段生成GET方法
-        $classRuleMetadata = ClassRuleMetaDataFactroy::getClassRuleMetadata($classMetadata);
-        foreach ($classRuleMetadata->getAllRuleColumn() as $ruleColumn){
-            if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT){
-                $manipulator->addGetter($ruleColumn->propertyName, DoctrineHelper::getPropertyTypeForColumn($ruleColumn->type), $ruleColumn->nullable);
+            //PHPZLC 重写 - 为表外字段生成GET方法
+            $classRuleMetadata = ClassRuleMetaDataFactroy::getClassRuleMetadata($classMetadata);
+            foreach ($classRuleMetadata->getAllRuleColumn() as $ruleColumn){
+                if($ruleColumn->propertyType == RuleColumn::PT_TABLE_OUT){
+                    $manipulator->addGetter($ruleColumn->propertyName, DoctrineHelper::getPropertyTypeForColumn($ruleColumn->type), $ruleColumn->nullable);
+                }
             }
         }
 
