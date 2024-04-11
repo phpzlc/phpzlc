@@ -62,7 +62,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
             $page = 1;
         }
 
-        $query = $this->_em->createNativeQuery($this->sql . " LIMIT " . (($page - 1) * $rows) . ", {$rows}", $this->runResultSetMappingBuilder);
+        $query = $this->getEntityManager()->createNativeQuery($this->sql . " LIMIT " . (($page - 1) * $rows) . ", {$rows}", $this->runResultSetMappingBuilder);
 
         return $query->getResult();
     }
@@ -174,7 +174,7 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
             $this->sqlArray['groupBy'] = '';
         }
 
-        return (int)$this->_em->getConnection()->fetchOne($this->getSql());
+        return (int)$this->getEntityManager()->getConnection()->fetchOne($this->getSql());
     }
 
     /**
