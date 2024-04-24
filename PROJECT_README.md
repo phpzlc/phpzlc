@@ -41,7 +41,7 @@ php bin/console doctrine:database:create
 php bin/console doctrine:schema:create
 
 //安装资源
-php bin/console assets:install  
+php bin/console asset-map:compile  
 
 //内置数据(APP_ENV=dev环境下可执行)
 php bin/console doctrine:fixtures:load  --append
