@@ -224,42 +224,44 @@ class ClassRuleMetaData
         }
 
         //表外字段
-        foreach ($classMetadata->reflClass->getProperties() as  $reflectionProperty) {
-            $attributes = $reflectionProperty->getAttributes('PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn');
-            foreach ($attributes as $attribute) {
-                $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
-                $comment = isset($attribute->getArguments()['comment']) ? $attribute->getArguments()['comment'] : '';
-                $type = isset($attribute->getArguments()['type']) ? $attribute->getArguments()['type'] : '';
-                $sql = isset($attribute->getArguments()['sql']) ? $attribute->getArguments()['sql'] : '';
-                $this->ruleColumns[$reflectionProperty->getName()] = new RuleColumn(
-                    empty($name) ? $reflectionProperty->getName() : $name,
-                    $reflectionProperty->getName(),
-                    $comment,
-                   $type,
-                    RuleColumn::PT_TABLE_OUT,
-                    $sql,
-                    true,
-                    false
-                );
-            }
-
-            $attributes = $reflectionProperty->getAttributes("PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule");
-            foreach ($attributes as $attribute) {
-                $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
-                $value = isset($attribute->getArguments()['value']) ? $attribute->getArguments()['value'] : '';
-                $collision = isset($attribute->getArguments()['collision']) ? $attribute->getArguments()['collision'] : null;
-                $jointClass = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointClass'] : null;
-                $jointSort = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointSort'] : null;
-                if (in_array($name, Rule::$defRule, true)) {
-                    throw new PHPZlcException('设置规则不能为默认规则');
+        if(!empty($classMetadata->reflClass)) {
+            foreach ($classMetadata->reflClass->getProperties() as $reflectionProperty) {
+                $attributes = $reflectionProperty->getAttributes('PHPZlc\PHPZlc\Doctrine\ORM\Mapping\OuterColumn');
+                foreach ($attributes as $attribute) {
+                    $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
+                    $comment = isset($attribute->getArguments()['comment']) ? $attribute->getArguments()['comment'] : '';
+                    $type = isset($attribute->getArguments()['type']) ? $attribute->getArguments()['type'] : '';
+                    $sql = isset($attribute->getArguments()['sql']) ? $attribute->getArguments()['sql'] : '';
+                    $this->ruleColumns[$reflectionProperty->getName()] = new RuleColumn(
+                        empty($name) ? $reflectionProperty->getName() : $name,
+                        $reflectionProperty->getName(),
+                        $comment,
+                        $type,
+                        RuleColumn::PT_TABLE_OUT,
+                        $sql,
+                        true,
+                        false
+                    );
                 }
-                $this->ruleColumns[$reflectionProperty->getName()]->addRule(new Rule(
-                    $name,
-                    $value,
-                    $collision,
-                    $jointClass,
-                    $jointSort,
-                ));
+
+                $attributes = $reflectionProperty->getAttributes("PHPZlc\PHPZlc\Doctrine\ORM\Mapping\AddRule");
+                foreach ($attributes as $attribute) {
+                    $name = isset($attribute->getArguments()['name']) ? $attribute->getArguments()['name'] : '';
+                    $value = isset($attribute->getArguments()['value']) ? $attribute->getArguments()['value'] : '';
+                    $collision = isset($attribute->getArguments()['collision']) ? $attribute->getArguments()['collision'] : null;
+                    $jointClass = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointClass'] : null;
+                    $jointSort = isset($attribute->getArguments()['jointClass']) ? $attribute->getArguments()['jointSort'] : null;
+                    if (in_array($name, Rule::$defRule, true)) {
+                        throw new PHPZlcException('设置规则不能为默认规则');
+                    }
+                    $this->ruleColumns[$reflectionProperty->getName()]->addRule(new Rule(
+                        $name,
+                        $value,
+                        $collision,
+                        $jointClass,
+                        $jointSort,
+                    ));
+                }
             }
         }
 
