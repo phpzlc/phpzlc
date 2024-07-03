@@ -542,9 +542,17 @@ abstract class AbstractServiceRuleRepository extends ServiceEntityRepository
                                 }
 
                                 if(array_key_exists($ruleColumn->name, $serviceRuleRepositoryClass->rewriteSqls)){
-                                    $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->name], $alias), $value);
+                                    if($key == 'select' && $ruleColumn->propertyType != RuleColumn::PT_TABLE_OUT){
+                                        $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->name] . ' as ' . $ruleColumn->name, $alias), $value);
+                                    }else{
+                                        $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->name], $alias), $value);
+                                    }
                                 }elseif(array_key_exists($ruleColumn->propertyName, $serviceRuleRepositoryClass->rewriteSqls)) {
-                                    $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
+                                    if($key == 'select' && $ruleColumn->propertyType != RuleColumn::PT_TABLE_OUT){
+                                        $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->propertyName] . ' as ' . $ruleColumn->name, $alias), $value);
+                                    }else{
+                                        $this->sqlArray[$key] = $this->rewriteSqlReplace($field, SQLHandle::sqlProcess($serviceRuleRepositoryClass->rewriteSqls[$ruleColumn->propertyName], $alias), $value);
+                                    }
                                 }else{
                                     $this->sqlArray[$key] = $this->rewriteSqlReplace($field, $ruleColumn->getSql($alias), $value);
                                 }
