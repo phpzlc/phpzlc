@@ -2,7 +2,9 @@
 namespace PHPZlc\PHPZlc\Abnormal;
 
 
+use Matrix\Exception;
 use PHPZlc\PHPZlc\Bundle\Controller\SystemBaseController;
+use PHPZlc\PHPZlc\Bundle\Safety\ActionLoad;
 use PHPZlc\PHPZlc\Bundle\Service\Log\Log;
 use PHPZlc\PHPZlc\Responses\Responses;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -140,6 +142,90 @@ class Errors
         return true;
     }
 
+
+    private static function getExceptionContent(\Throwable $exception)
+    {
+        return trim(<<<EOF
+[报错追踪]
+[MESSAGE] {$exception->getMessage()}
+[FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()}
+[TRACE]
+{$exception->getTraceAsString()}
+EOF
+        );
+    }
+
+    public static function getRequestContent()
+    {
+        try {
+            $request = ActionLoad::$globalContainer->get('request_stack');
+
+            $post_params_content = '';
+            $header_content = '';
+            $cookies_content = '';
+
+            $url = $request->getCurrentRequest()->getSchemeAndHttpHost() . $request->getCurrentRequest()->getRequestUri();
+            $method = $request->getCurrentRequest()->getMethod();
+            $headers = $request->getCurrentRequest()->headers->all();
+            $post_params = $request->getCurrentRequest()->request->all();
+            $cookies_params = $request->getCurrentRequest()->cookies->all();
+            $ip = $request->getCurrentRequest()->getClientIp();
+
+            foreach ($headers as $key => $value) {
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $header_content .= $key . ':' . $value . ';';
+            }
+
+            foreach ($post_params as $key => $value) {
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $post_params_content .= $key . ':' . $value . ';';
+            }
+
+            foreach ($cookies_params as $key => $value) {
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
+                $cookies_content .= $key . ':' . $value . ';';
+            }
+
+            $userInfo = '[UserAuthId]';
+
+            if (class_exists('\App\Business\AuthBusiness\CurAuthSubject')) {
+                $userAuth = \App\Business\AuthBusiness\CurAuthSubject::getCurUserAuth();
+                if (!empty($userAuth)) {
+                    $userInfo .= ' ' . $userAuth->getId();
+                }
+            }
+
+            $requestContent = <<<EOF
+[Url] {$method}:{$url} [IP] {$ip}
+[Headers] {$header_content}
+[Cookies] {$cookies_content}
+[Post] {$post_params_content}
+{$userInfo}
+\n
+EOF;
+
+        }catch (Exception $exception){
+            $exceptionContent = self::getExceptionContent($exception);
+            $requestContent = <<<EOF
+Request 对象获取失败
+{$exceptionContent}
+EOF;
+            ;
+        }
+
+        return trim(<<<EOF
+[请求信息]
+{$requestContent}
+EOF
+        );
+    }
+
     /**
      * 报错通知
      *
@@ -147,8 +233,20 @@ class Errors
      * @return void
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
-    public static function notificationError($logContent)
+    public static function notificationError($msg)
     {
+        $msg = trim($msg);
+        $time = date('Y-m-d H:i:s');
+        $requestContent = self::getRequestContent();
+        $logContent = <<<EOF
+[Start]
+{$msg}
+{$requestContent}
+[time]{$time}
+[END]
+\n
+EOF;
+
         //记录日志
         Log::writeLog($logContent);
 
@@ -195,12 +293,11 @@ class Errors
      *
      * @param \Throwable $exception
      * @param bool $isThrow
-     * @param RequestStack|null $request
      * @return false|\Symfony\Component\HttpFoundation\JsonResponse|Response|void
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      * @throws \Throwable
      */
-    public static function exceptionError(\Throwable $exception, bool $isThrow = true, RequestStack $request = null)
+    public static function exceptionError(\Throwable $exception, bool $isThrow = true)
     {
         if($isThrow){
             if(Errors::isExistError()){
@@ -233,78 +330,19 @@ class Errors
                 )
             );
 
-            $url = '';
-            $method = $request->getCurrentRequest()->getMethod();
-            $post_params_content = '';
-            $header_content = '';
-            $cookies_content = '';
-            $ip = '';
-
-            if(!empty($request)){
-                $url = $request->getCurrentRequest()->getSchemeAndHttpHost() . $request->getCurrentRequest()->getRequestUri();
-                $method = $request->getCurrentRequest()->getMethod();
-                $headers = $request->getCurrentRequest()->headers->all();
-                $post_params = $request->getCurrentRequest()->request->all();
-                $cookies_params =  $request->getCurrentRequest()->cookies->all();
-                $ip = $request->getCurrentRequest()->getClientIp();
-
-                foreach ($headers as $key => $value){
-                    if(is_array($value)){
-                        $value = json_encode($value);
-                    }
-                    $header_content .= $key . ':' . $value . ';';
-                }
-
-                foreach ($post_params as $key => $value){
-                    if(is_array($value)){
-                        $value = json_encode($value);
-                    }
-                    $post_params_content .= $key . ':' . $value . ';';
-                }
-
-                foreach ($cookies_params as $key => $value){
-                    if(is_array($value)){
-                        $value = json_encode($value);
-                    }
-                    $cookies_content .= $key . ':' . $value . ';';
-                }
-            }
-
-            $userInfo = '[UserAuthId]';
-
-            if(class_exists('\App\Business\AuthBusiness\CurAuthSubject')){
-                $userAuth = \App\Business\AuthBusiness\CurAuthSubject::getCurUserAuth();
-                if(!empty($userAuth)){
-                    $userInfo .= ' ' . $userAuth->getId();
-                }
-            }
-
-            $time = date('Y-m-d H:i:s');
-            $logContent = <<<EOF
-
-[MESSAGE] {$exception->getMessage()}
-[FILE] {$exception->getFile()} [[LINE]] {$exception->getLine()} [CODE] {$exception->getCode()}
-[Url] {$method}:{$url} [IP] {$ip}
-[TRACE]
-{$exception->getTraceAsString()}
-[Headers] {$header_content}
-[Cookies] {$cookies_content}
-[Post] {$post_params_content}
-{$userInfo}
-[Msg] $networkErrorMessage
-[Time] {$time}
-[END]
-\n
-EOF;
+            $errorContent = self::getExceptionContent($exception);
 
             //发送报错邮件给开发者
-            self::notificationError($logContent);
+            self::notificationError(<<<EOF
+$networkErrorMessage
+{$errorContent}
+EOF
+            );
         }
 
         switch (SystemBaseController::getReturnType()) {
             case SystemBaseController::RETURN_SHOW_RESOURCE:
                 throw new NotFoundHttpException($networkErrorMessage);
-                break;
             case SystemBaseController::RETURN_HIDE_RESOURCE:
                 return Responses::error($error);
             default:
