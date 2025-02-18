@@ -230,10 +230,11 @@ EOF
      * 报错通知
      *
      * @param $logContent
+     * @param string $logFileName
      * @return void
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
-    public static function notificationError($msg)
+    public static function notificationError($msg, $logFileName = '')
     {
         $msg = trim($msg);
         $time = date('Y-m-d H:i:s');
@@ -248,7 +249,7 @@ EOF
 EOF;
 
         //记录日志
-        Log::writeLog($logContent);
+        Log::writeLog($logContent, $logFileName);
 
         //发送报错邮件给开发者
         if(isset($_ENV['MAILER_DSN']) && isset($_ENV['ERROR_EMAIL_COF'])){
