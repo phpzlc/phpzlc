@@ -68,6 +68,27 @@ abstract class AbstractServiceEntityRepository extends  AbstractServiceRuleRepos
     }
 
     /**
+     * 根据偏移量在数据中检索
+     *
+     * @param $rows
+     * @param int $offset
+     * @param Rules|array|null $rules
+     * @param ResultSetMappingBuilder|null $resultSetMappingBuilder
+     * @param string $aliasChain
+     * @return mixed
+     */
+    final public function findLimitOffsetAll($rows, $offset = 0, $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+    {
+        $this->rules($rules, $resultSetMappingBuilder, $aliasChain);
+
+        $this->getSql();
+
+        $query = $this->_em->createNativeQuery($this->sql . " LIMIT {$offset}, {$rows}", $this->runResultSetMappingBuilder);
+
+        return $query->getResult();
+    }
+
+    /**
      * 检索一条数据
      *
      * @param Rules|array|null $rules

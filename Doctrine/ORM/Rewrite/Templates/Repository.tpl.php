@@ -19,6 +19,7 @@ use PHPZlc\PHPZlc\Doctrine\ORM\Rule\Rules;
 * @method <?= $entity_class_name; ?>[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
 * @method <?= $entity_class_name; ?>[]    findAll($rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
 * @method <?= $entity_class_name; ?>[]    findLimitAll($rows, $page = 1, $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
+* @method <?= $entity_class_name; ?>[]    findLimitOffsetAll($rows, $offset = 0, $rules = null, ResultSetMappingBuilder $resultSetMappingBuilder = null, $aliasChain = '')
 */
 class <?= $class_name; ?> extends AbstractServiceEntityRepository
 {
