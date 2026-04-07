@@ -46,6 +46,14 @@ abstract class AbstractBusiness extends AbstractController
         }
     }
 
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
     protected function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
         if($this->container->has('parameter_bag')){
