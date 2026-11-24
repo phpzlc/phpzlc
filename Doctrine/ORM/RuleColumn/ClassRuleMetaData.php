@@ -214,11 +214,11 @@ class ClassRuleMetaData
                     'Entity',
                     RuleColumn::PT_TYPE_TARGET,
                     'sql_pre.' . $name,
-                    $this->getNullableOfField($fieldName),
+                    $this->getNullableOfField($mapping['fieldName']),
                     true,
                     $mapping['targetEntity'],
                     $mapping['sourceEntity'],
-                    $targetName_var
+                    $targetName
                 );
             }
         }
